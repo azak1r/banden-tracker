@@ -1,14 +1,27 @@
-// ===== App start =====
-document.addEventListener("DOMContentLoaded", async () => {
+async function initApp() {
+  if (!isLoggedIn()) {
+    showLogin();
+    return;
+  }
+
   try {
     await renderVehicles();
     await renderAlerts();
-    bindAddVehicleButtons();
-  } catch (error) {
-    console.error("App start failed:", error);
-    alert("Kon de app niet starten. Controleer of PocketBase draait.");
+    // any other startup calls
+  } catch (err) {
+    console.error(err);
+    // If the token is invalid/expired, force re-login
+    if (err.message?.includes("401") || err.status === 401) {
+      logout();
+      showLogin();
+    } else {
+      alert("Kon de app niet starten. Controleer of PocketBase draait.");
+    }
   }
-});
+}
+
+// Call this on load instead of the old startup code
+initApp();
 
 // ===== Bottom navigation =====
 const navItems = document.querySelectorAll(".nav-item");
