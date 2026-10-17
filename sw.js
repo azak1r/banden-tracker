@@ -1,4 +1,4 @@
-const CACHE = "banden-tracker-v1";
+const CACHE = "banden-tracker-v0.1.0";
 const ASSETS = [
   "/banden-tracker/",
   "/banden-tracker/index.html",
