@@ -1287,3 +1287,25 @@ button:disabled {
   pointer-events: none;
   z-index: 50;
 }
+
+.todo-section {
+  margin-bottom: 1.5rem;
+}
+.todo-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent-dark);
+}
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.todo-list li {
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
