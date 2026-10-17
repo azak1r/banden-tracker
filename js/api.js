@@ -27,15 +27,16 @@ function authHeaders() {
 }
 
 async function pbRequest(path, options = {}) {
+  const url = path.startsWith("api/") ? path : `api/${path}`;
   const headers = {
     "Content-Type": "application/json",
     ...authHeaders(),
     ...(options.headers || {})
   };
-  const res = await fetch(`${PB_URL}${path}`, { ...options, headers });
+  const res = await fetch(`${PB_URL}/${url}`, { ...options, headers });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
-  }
+}
 
 // ----- Vehicles -----
 async function apiGetAllVehicles() {
