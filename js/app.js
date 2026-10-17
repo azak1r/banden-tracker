@@ -82,6 +82,7 @@ function mapVehicle(record) {
     type: record.type,
     brand: record.brand || "",
     model: record.model || "",
+    driver: record.driver || "",
     axles: record.axles || [],
     lastInspection: record.lastInspection || null,
     createdAt: record.createdAt || record.created
@@ -191,7 +192,10 @@ function buildVehicleCard(vehicle, tires) {
           ${vehicle.plate}
           ${isNew ? '<span class="badge-new">Nieuw</span>' : ""}
         </div>
-        <div class="vehicle-type">${typeLabel} • ${vehicle.brand || ""} ${vehicle.model || ""}</div>
+        <div class="vehicle-type">
+          ${typeLabel} • ${vehicle.brand || ""} ${vehicle.model || ""}
+          ${vehicle.driver ? ` • ${vehicle.driver}` : ""}
+        </div>
       </div>
     </div>
     <div class="vehicle-status ${status.class}">${status.text}</div>
@@ -296,7 +300,8 @@ function attachVehicleClickEvents() {
           vehicle.type === "oplegger" ? "Oplegger" : "Aanhangwagen";
 
         document.getElementById("detail-type").textContent =
-          `${typeLabel} • ${vehicle.brand || ""} ${vehicle.model || ""}`.trim();
+          `${typeLabel} • ${vehicle.brand || ""} ${vehicle.model || ""}`.trim() +
+            (vehicle.driver ? ` • ${vehicle.driver}` : "");
 
         let meta = vehicle.lastInspection
           ? `Laatste inspectie: ${new Date(vehicle.lastInspection).toLocaleDateString("nl-NL")}`
@@ -525,6 +530,7 @@ document.getElementById("form-add-vehicle")?.addEventListener("submit", async (e
   const type = document.getElementById("new-type").value;
   const brand = document.getElementById("new-brand").value.trim();
   const model = document.getElementById("new-model").value.trim();
+  const driver = document.getElementById("new-driver").value.trim();
 
   if (!plate) {
     alert("Vul een kenteken in");
@@ -558,6 +564,7 @@ document.getElementById("form-add-vehicle")?.addEventListener("submit", async (e
     type,
     brand,
     model,
+    driver,
     axles,
     lastInspection: null,
     createdAt: new Date().toISOString()

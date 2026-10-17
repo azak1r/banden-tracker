@@ -60,6 +60,7 @@ async function apiCreateVehicle(vehicle) {
       type: vehicle.type,
       brand: vehicle.brand || "",
       model: vehicle.model || "",
+      driver: vehicle.driver || "",
       axles: vehicle.axles || [],
       lastInspection: vehicle.lastInspection || "",
       createdAt: vehicle.createdAt || new Date().toISOString()
