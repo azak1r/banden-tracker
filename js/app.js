@@ -340,9 +340,44 @@ async function openVehicleDetail(vehicle, tires) {
     vehicle.type === "trekker" ? "Trekker / Vrachtwagen" :
     vehicle.type === "oplegger" ? "Oplegger" : "Aanhangwagen";
 
+  const driverText = document.getElementById("detail-driver-text");
+    if (driverText) {
+      driverText.textContent = vehicle.driver || "Geen chauffeur";
+    }
+
   document.getElementById("detail-type").textContent =
     `${typeLabel} • ${vehicle.brand || ""} ${vehicle.model || ""}`.trim() +
     (vehicle.driver ? ` • ${vehicle.driver}` : "");
+
+    document.getElementById("btn-edit-driver")?.addEventListener("click", () => {
+  const form = document.getElementById("driver-edit-form");
+  const input = document.getElementById("edit-driver-input");
+  const current = document.getElementById("detail-driver-text").textContent;
+  input.value = current === "Geen chauffeur" ? "" : current;
+  form.hidden = false;
+});
+
+document.getElementById("btn-cancel-driver")?.addEventListener("click", () => {
+  document.getElementById("driver-edit-form").hidden = true;
+});
+
+document.getElementById("btn-save-driver")?.addEventListener("click", async () => {
+  const plate = document.getElementById("detail-plate").textContent.trim();
+  const newDriver = document.getElementById("edit-driver-input").value.trim();
+
+  const raw = await apiGetVehicleByPlate(plate);
+  if (!raw) return;
+
+  await apiUpdateVehicle(raw.id, { driver: newDriver });
+  clearCache();
+
+  document.getElementById("detail-driver-text").textContent = newDriver || "Geen chauffeur";
+  document.getElementById("driver-edit-form").hidden = true;
+
+  // Refresh the card lists
+  await renderVehicles();
+  await renderVehiclesList(document.getElementById("vehicle-search")?.value || "");
+});
 
   let meta = vehicle.lastInspection
     ? `Laatste inspectie: ${new Date(vehicle.lastInspection).toLocaleDateString("nl-NL")}`

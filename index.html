@@ -75,6 +75,17 @@
         <div class="detail-header-main">
           <div class="detail-plate-large" id="detail-plate">–</div>
           <div class="detail-type" id="detail-type">–</div>
+
+          <div class="detail-driver">
+            <span id="detail-driver-text">–</span>
+            <button type="button" id="btn-edit-driver" class="btn-secondary btn-sm">Bewerken</button>
+          </div>
+          <div id="driver-edit-form" hidden>
+            <input type="text" id="edit-driver-input" placeholder="Naam chauffeur">
+            <button type="button" id="btn-save-driver" class="btn-primary btn-sm">Opslaan</button>
+            <button type="button" id="btn-cancel-driver" class="btn-secondary btn-sm">Annuleren</button>
+          </div>
+
           <div class="detail-meta" id="detail-meta"></div>
         </div>
         <div class="detail-summary" id="detail-summary"></div>
@@ -270,7 +281,7 @@
     <h3>Hoge prioriteit</h3>
     <ul class="todo-list">
       <li style="text-decoration:line-through; opacity:0.6;">Versnellen van database aanvragen</li>
-      <li>Klikbare meldingen (open voertuig of band)</li>
+      <li style="text-decoration:line-through; opacity:0.6;">Klikbare meldingen (open voertuig of band)</li>
       <li>Chauffeur bewerkbaar maken op detailpagina</li>
       <li>Vertalingen in JavaScript afmaken</li>
     </ul>

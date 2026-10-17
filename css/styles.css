@@ -1309,3 +1309,25 @@ button:disabled {
   margin-bottom: 0.4rem;
   font-size: 0.9rem;
 }
+
+.detail-driver {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+#driver-edit-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+#driver-edit-form[hidden] { display: none; }
+#edit-driver-input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-body);
+  color: var(--text-primary);
+}
