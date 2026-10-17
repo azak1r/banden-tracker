@@ -167,6 +167,7 @@ body {
 
 .nav-item {
   display: flex;
+  position: relative;
   flex-direction: column;
   align-items: center;
   gap: 2px;
@@ -176,6 +177,23 @@ body {
   color: var(--text-secondary);
   font-size: 0.7rem;
   padding: 6px 12px;
+}
+
+.nav-badge {
+  position: absolute;
+  top: 2px;
+  right: 12px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
 }
 
 .nav-item.active {
@@ -295,7 +313,7 @@ body {
 }
 
 .status-danger,
-.status-critiek,
+.status-kritiek,
 .tire-status.status-danger {
   background: #fee2e2;
   color: #991b1b;
@@ -426,6 +444,126 @@ body {
 .alert-content p {
   font-size: 0.85rem;
   color: var(--text-secondary);
+}
+
+.alert-group {
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+.alert-group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.alert-group-header .plate { font-weight: 600; }
+.alert-group-header .counts { display: flex; gap: 0.4rem; }
+.alert-group-header .badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  color: #fff;
+}
+.alert-group-header .badge.danger { background: #ef4444; }
+.alert-group-header .badge.warning { background: #f59e0b; }
+.alert-group-body { padding: 0 0.5rem 0.5rem; }
+.alert-group-body .alert-card { margin-bottom: 0.4rem; }
+
+/* ===== Alerts page ===== */
+#alerts-list h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.alert-group {
+  margin-bottom: 0.6rem;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.alert-group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.alert-group-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.alert-group-header .plate {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.alert-group-header .counts {
+  display: flex;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.alert-group-header .badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-group-header .badge.danger { background: #ef4444; }
+.alert-group-header .badge.warning { background: #f59e0b; }
+
+.alert-group-header .chevron {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  transition: transform 0.15s ease;
+}
+
+.alert-group-body {
+  padding: 0 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.alert-group-body[hidden] {
+  display: none;
+}
+
+/* Reuse existing alert-card styles, just tighten them inside the group */
+.alert-group-body .alert-card {
+  margin: 0;
+  border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+  .alert-group-header {
+    padding: 1rem;
+  }
 }
 
 [data-theme="dark"] .alert-danger .alert-content strong {

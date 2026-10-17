@@ -36,7 +36,6 @@
     <!-- Dashboard -->
     <section id="page-dashboard" class="page active">
       <section class="alerts">
-        <h2 data-i18n="alertsTitle">Meldingen</h2>
       </section>
 
       <section class="vehicles">
@@ -61,9 +60,7 @@
 
     <!-- Alerts -->
     <section id="page-alerts" class="page">
-      <h2 data-i18n="alertsTitle">Meldingen</h2>
-      <div id="alerts-full-list">
-        <p class="placeholder">Hier komen later alle openstaande meldingen.</p>
+      <div id="alerts-list">
       </div>
     </section>
 
@@ -284,9 +281,10 @@
       <span class="nav-icon">🚛</span>
       <span class="nav-label">Voertuigen</span>
     </button>
-    <button class="nav-item" type="button">
-      <span class="nav-icon">🔔</span>
+    <button class="nav-item" data-page="2">
+      <span class="nav-icon">⚠️</span>
       <span class="nav-label">Meldingen</span>
+      <span id="alerts-badge" class="nav-badge" hidden>0</span>
     </button>
     <button class="nav-item" type="button">
       <span class="nav-icon">⚙️</span>

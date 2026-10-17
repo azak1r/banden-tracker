@@ -8,7 +8,7 @@ async function initApp() {
 
   try {
     await renderVehicles();
-    await renderAlerts();
+    await updateAlertsBadge();
     // any other startup calls
   } catch (err) {
     console.error(err);
@@ -45,6 +45,9 @@ navItems.forEach((item, index) => {
     if (index === 1) {
       const search = document.getElementById("vehicle-search");
       await renderVehiclesList(search ? search.value : "");
+    }
+    if (index === 2) {          // alerts tab
+      await renderAlertsPage();
     }
   });
 });
@@ -175,7 +178,7 @@ function getVehicleStatus(tires, vehicle) {
   }
 
   if (!hasData) return { class: "status-new", text: "Nieuw" };
-  if (hasDanger) return { class: "status-danger", text: "Critiek" };
+  if (hasDanger) return { class: "status-danger", text: "Kritiek" };
   if (hasWarning) return { class: "status-warning", text: "Let op" };
   return { class: "status-good", text: "Goed" };
 }
@@ -460,8 +463,8 @@ document.getElementById("btn-delete-vehicle")?.addEventListener("click", async (
     await apiDeleteVehicle(vehicle.id);
 
     await renderVehicles();
+    await updateAlertsBadge();
     await renderVehiclesList(document.getElementById("vehicle-search")?.value || "");
-    await renderAlerts();
 
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById("page-dashboard").classList.add("active");
@@ -587,8 +590,8 @@ document.getElementById("form-add-vehicle")?.addEventListener("submit", async (e
     await apiCreateVehicle(vehicle);
     await apiCreateTiresForVehicle(vehicle);
     await renderVehicles();
+    await updateAlertsBadge();
     await renderVehiclesList(document.getElementById("vehicle-search")?.value || "");
-    await renderAlerts();
     openInspectionForm(vehicle.plate, "initial");
   } catch (error) {
     console.error(error);
@@ -758,8 +761,8 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
     }
 
     await renderVehicles();
+    await updateAlertsBadge();
     await renderVehiclesList(document.getElementById("vehicle-search")?.value || "");
-    await renderAlerts();
 
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById("page-dashboard").classList.add("active");
@@ -1001,35 +1004,67 @@ async function collectAllAlerts() {
   return alerts;
 }
 
-async function renderAlerts() {
-  const container = document.querySelector("#page-dashboard .alerts");
+async function renderAlertsPage() {
+  const container = document.getElementById("alerts-list"); // or whatever the container id is on the alerts page
   if (!container) return;
 
   const alerts = await collectAllAlerts();
-  container.innerHTML = `<h2 data-i18n="alertsTitle">Meldingen</h2>`;
+  container.innerHTML = `<h2>Meldingen</h2>`;
 
   if (alerts.length === 0) {
     container.innerHTML += `<p class="placeholder">Geen openstaande meldingen. Alles in orde.</p>`;
     return;
   }
 
-  for (const alert of alerts.slice(0, 8)) {
-    const levelClass = alert.level === "danger" ? "alert-danger" : "alert-warning";
-    const icon = alert.level === "danger" ? "⚠️" : "📅";
-    const sub = alert.position ? `${alert.vehiclePlate} • ${alert.position}` : alert.vehiclePlate;
-    container.innerHTML += `
-      <div class="alert-card ${levelClass}">
-        <div class="alert-icon">${icon}</div>
-        <div class="alert-content">
-          <strong>${alert.message}</strong>
-          <p>${sub}</p>
-        </div>
-      </div>
-    `;
+  // Group by plate
+  const grouped = {};
+  for (const a of alerts) {
+    if (!grouped[a.vehiclePlate]) grouped[a.vehiclePlate] = [];
+    grouped[a.vehiclePlate].push(a);
   }
 
-  if (alerts.length > 8) {
-    container.innerHTML += `<p class="placeholder">+ ${alerts.length - 8} andere meldingen</p>`;
+  for (const [plate, items] of Object.entries(grouped)) {
+    const dangerCount = items.filter(i => i.level === "danger").length;
+    const warningCount = items.length - dangerCount;
+
+    const group = document.createElement("div");
+    group.className = "alert-group";
+    group.innerHTML = `
+      <button type="button" class="alert-group-header">
+        <span class="plate">${plate}</span>
+        <span class="counts">
+          ${dangerCount ? `<span class="badge danger">${dangerCount}</span>` : ""}
+          ${warningCount ? `<span class="badge warning">${warningCount}</span>` : ""}
+        </span>
+        <span class="chevron">▸</span>
+      </button>
+      <div class="alert-group-body" hidden>
+        ${items.map(item => {
+          const levelClass = item.level === "danger" ? "alert-danger" : "alert-warning";
+          const icon = item.level === "danger" ? "⚠️" : "📅";
+          const sub = item.position ? item.position : "";
+          return `
+            <div class="alert-card ${levelClass}">
+              <div class="alert-icon">${icon}</div>
+              <div class="alert-content">
+                <strong>${item.message}</strong>
+                ${sub ? `<p>${sub}</p>` : ""}
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+
+    group.querySelector(".alert-group-header").addEventListener("click", () => {
+      const body = group.querySelector(".alert-group-body");
+      const chevron = group.querySelector(".chevron");
+      const isOpen = !body.hidden;
+      body.hidden = isOpen;
+      chevron.textContent = isOpen ? "▸" : "▾";
+    });
+
+    container.appendChild(group);
   }
 }
 
@@ -1285,10 +1320,24 @@ document.getElementById("login-form")?.addEventListener("submit", async (e) => {
     hideLogin();
     applyRoleUI();
     await renderVehicles();
-    await renderAlerts();
+    await updateAlertsBadge();
   } catch (err) {
     errorEl.textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord.";
     errorEl.style.display = "block";
   }
 });
 
+async function updateAlertsBadge() {
+  const badge = document.getElementById("alerts-badge");
+  if (!badge) return;
+
+  const alerts = await collectAllAlerts();
+  const count = alerts.length;
+
+  if (count === 0) {
+    badge.hidden = true;
+  } else {
+    badge.hidden = false;
+    badge.textContent = count > 99 ? "99+" : count;
+  }
+}
