@@ -1,3 +1,35 @@
+// ===== Simple data cache =====
+const dataCache = {
+  vehicles: null,
+  tires: {},
+  ts: 0
+};
+const CACHE_MS = 30_000;
+
+function isCacheFresh() {
+  return Date.now() - dataCache.ts < CACHE_MS;
+}
+
+async function getVehiclesCached() {
+  if (dataCache.vehicles && isCacheFresh()) return dataCache.vehicles;
+  dataCache.vehicles = await loadVehiclesFromApi();
+  dataCache.ts = Date.now();
+  return dataCache.vehicles;
+}
+
+async function getTiresCached(plate) {
+  if (dataCache.tires[plate] && isCacheFresh()) return dataCache.tires[plate];
+  const tires = await loadTiresFromApi(plate);
+  dataCache.tires[plate] = tires;
+  return tires;
+}
+
+function clearCache() {
+  dataCache.vehicles = null;
+  dataCache.tires = {};
+  dataCache.ts = 0;
+}
+
 async function initApp() {
   if (!isLoggedIn()) {
     showLogin();
@@ -123,38 +155,6 @@ async function loadVehiclesFromApi() {
 async function loadTiresFromApi(plate) {
   const items = await apiGetTiresForVehicle(plate);
   return items.map(mapTire);
-}
-
-// ===== Simple cache =====
-const cache = {
-  vehicles: null,
-  tires: {},          // plate → tires[]
-  ts: 0
-};
-const CACHE_MS = 30_000; // 30 seconds
-
-function isCacheFresh() {
-  return Date.now() - cache.ts < CACHE_MS;
-}
-
-async function getVehiclesCached() {
-  if (cache.vehicles && isCacheFresh()) return cache.vehicles;
-  cache.vehicles = await loadVehiclesFromApi();
-  cache.ts = Date.now();
-  return cache.vehicles;
-}
-
-async function getTiresCached(plate) {
-  if (cache.tires[plate] && isCacheFresh()) return cache.tires[plate];
-  const tires = await loadTiresFromApi(plate);
-  cache.tires[plate] = tires;
-  return tires;
-}
-
-function clearCache() {
-  cache.vehicles = null;
-  cache.tires = {};
-  cache.ts = 0;
 }
 
 // ===== Helpers =====
