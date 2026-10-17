@@ -1,5 +1,5 @@
 // ===== PocketBase API =====
-const PB_URL = "https://te97luowr66c6j7.pwz5.pocketbasecloud.com";
+const PB_URL = "https://te97luowr66c6j7.pwz5.pocketbasecloud.com/";
 
 const pb = new PocketBase(PB_URL);
 
