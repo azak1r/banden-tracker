@@ -1,10 +1,4 @@
-// ===== PocketBase API =====
-import PocketBase from "pocketbase";
-
 const pb = new PocketBase("https://te97luowr66c6j7.pwz5.pocketbasecloud.com");
-
-// Load the PocketBase SDK (add this script tag in index.html if not already present)
-// <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.5/dist/pocketbase.umd.js"></script>
 
 async function login(email, password) {
   return await pb.collection("users").authWithPassword(email, password);
