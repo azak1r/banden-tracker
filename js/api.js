@@ -27,13 +27,18 @@ function authHeaders() {
 }
 
 async function pbRequest(path, options = {}) {
-  const url = path.startsWith("api/") ? path : `api/${path}`;
+  const base = PB_URL.replace(/\/$/, "");
+  let clean = path.replace(/^\//, "");
+  if (!clean.startsWith("api/")) clean = "api/" + clean;
+  const url = `${base}/${clean}`;
+
   const headers = {
     "Content-Type": "application/json",
     ...authHeaders(),
     ...(options.headers || {})
   };
-  const res = await fetch(`${PB_URL}/${url}`, { ...options, headers });
+
+  const res = await fetch(url, { ...options, headers });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }

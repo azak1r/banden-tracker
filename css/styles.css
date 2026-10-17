@@ -446,37 +446,6 @@ body {
   color: var(--text-secondary);
 }
 
-.alert-group {
-  margin-bottom: 0.5rem;
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--bg-secondary);
-}
-.alert-group-header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background: none;
-  border: none;
-  color: inherit;
-  font-size: 1rem;
-  cursor: pointer;
-}
-.alert-group-header .plate { font-weight: 600; }
-.alert-group-header .counts { display: flex; gap: 0.4rem; }
-.alert-group-header .badge {
-  font-size: 0.75rem;
-  padding: 0.15rem 0.45rem;
-  border-radius: 999px;
-  color: #fff;
-}
-.alert-group-header .badge.danger { background: #ef4444; }
-.alert-group-header .badge.warning { background: #f59e0b; }
-.alert-group-body { padding: 0 0.5rem 0.5rem; }
-.alert-group-body .alert-card { margin-bottom: 0.4rem; }
-
 /* ===== Alerts page ===== */
 #alerts-list h2 {
   margin: 0 0 1rem;
@@ -486,7 +455,7 @@ body {
 .alert-group {
   margin-bottom: 0.6rem;
   border-radius: 12px;
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   overflow: hidden;
 }
@@ -500,7 +469,7 @@ body {
   padding: 0.85rem 1rem;
   background: none;
   border: none;
-  color: var(--text);
+  color: var(--text-primary);
   font-size: 1rem;
   cursor: pointer;
   text-align: left;
@@ -1274,7 +1243,7 @@ body {
   z-index: 1000;
 }
 .modal-content {
-  background: var(--bg);
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 12px;
   width: 90%;
@@ -1287,8 +1256,8 @@ body {
   padding: 0.6rem;
   border-radius: 8px;
   border: 1px solid var(--border);
-  background: var(--bg-secondary);
-  color: var(--text);
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 .modal-content button { width: 100%; margin-top: 1rem; }
 .error { color: #f87171; font-size: 0.85rem; margin-top: 0.5rem; }

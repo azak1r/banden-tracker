@@ -126,11 +126,6 @@ async function loadTiresFromApi(plate) {
 
 // ===== Helpers =====
 function getTireDisplayStatus(tire, vehicle) {
-  // No inspection done for this vehicle → unknown
-  if (vehicle && !vehicle.lastInspection) {
-    return { class: "status-unknown", text: "Onbekend", level: "unknown" };
-  }
-
   let level = "unknown";
 
   if (tire.currentDepth != null && tire.currentDepth > 0) {
@@ -997,23 +992,10 @@ function isInspectionOverdue(vehicle) {
 async function collectAllAlerts() {
   const vehicles = await loadVehiclesFromApi();
   const alerts = [];
-  const inspectionAlert = getInspectionAlert(vehicle);
-    if (inspectionAlert) alerts.push(inspectionAlert);
 
   for (const vehicle of vehicles) {
-    if (isInspectionOverdue(vehicle)) {
-      const days = vehicle.lastInspection
-        ? Math.floor((Date.now() - new Date(vehicle.lastInspection)) / (1000 * 60 * 60 * 24))
-        : null;
-      alerts.push({
-        level: vehicle.lastInspection ? "warning" : "danger",
-        vehiclePlate: vehicle.plate,
-        message: vehicle.lastInspection
-          ? `Inspectie verlopen (${days} dagen geleden)`
-          : "Nog geen inspectie uitgevoerd",
-        type: "inspection"
-      });
-    }
+    const inspectionAlert = getInspectionAlert(vehicle);
+    if (inspectionAlert) alerts.push(inspectionAlert);
 
     const tires = await loadTiresFromApi(vehicle.plate);
     for (const tire of tires) {
