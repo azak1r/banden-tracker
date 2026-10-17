@@ -321,6 +321,141 @@ document.getElementById("vehicle-search")?.addEventListener("input", (e) => {
   renderVehiclesList(e.target.value);
 });
 
+
+async function openVehicleDetail(vehicle, tires) {
+  const inspectBtn = document.getElementById("btn-new-inspection");
+  if (inspectBtn) {
+    const cd = inspectionCountdown(vehicle);
+    const canInspect = cd.daysLeft == null || cd.daysLeft <= 30;
+    inspectBtn.disabled = !canInspect;
+    inspectBtn.title = canInspect
+      ? "Inspectie starten"
+      : `Inspectie nog niet nodig (nog ${cd.daysLeft} dagen)`;
+    inspectBtn.classList.toggle("btn-disabled", !canInspect);
+  }
+
+  document.getElementById("detail-plate").textContent = vehicle.plate;
+
+  const typeLabel =
+    vehicle.type === "trekker" ? "Trekker / Vrachtwagen" :
+    vehicle.type === "oplegger" ? "Oplegger" : "Aanhangwagen";
+
+  document.getElementById("detail-type").textContent =
+    `${typeLabel} • ${vehicle.brand || ""} ${vehicle.model || ""}`.trim() +
+    (vehicle.driver ? ` • ${vehicle.driver}` : "");
+
+  let meta = vehicle.lastInspection
+    ? `Laatste inspectie: ${new Date(vehicle.lastInspection).toLocaleDateString("nl-NL")}`
+    : "Nog geen inspectie uitgevoerd";
+
+  if (vehicle.axles?.length) {
+    const names = { steer: "Stuur-as", driven: "Aandrijfas", lift: "Liftas", stiff: "Starre as" };
+    const axleText = vehicle.axles.map(a => names[a.type] || a.type).join(", ");
+    meta += ` • ${vehicle.axles.length} assen (${axleText})`;
+  }
+
+  const metaEl = document.getElementById("detail-meta");
+  if (metaEl) metaEl.textContent = meta;
+
+  const summaryEl = document.getElementById("detail-summary");
+  if (summaryEl) {
+    let good = 0, warning = 0, danger = 0, unknown = 0;
+    tires.forEach(t => {
+      const level = getTireDisplayStatus(t).level;
+      if (level === "good") good++;
+      else if (level === "warning") warning++;
+      else if (level === "danger") danger++;
+      else unknown++;
+    });
+    summaryEl.innerHTML = `
+      <span class="summary-chip total">${tires.length} banden</span>
+      ${good ? `<span class="summary-chip good">${good} goed</span>` : ""}
+      ${warning ? `<span class="summary-chip warning">${warning} let op</span>` : ""}
+      ${danger ? `<span class="summary-chip danger">${danger} actie</span>` : ""}
+      ${unknown ? `<span class="summary-chip">${unknown} onbekend</span>` : ""}
+    `;
+  }
+
+  const tireContainer = document.querySelector(".tire-positions");
+  if (tireContainer) {
+    tireContainer.innerHTML = `
+      <div class="section-header tight">
+        <h3 id="tire-section-title">Bandposities (${tires.length})</h3>
+      </div>
+    `;
+
+    if (tires.length === 0) {
+      tireContainer.innerHTML += `<p class="placeholder">Nog geen banden geregistreerd.</p>`;
+    } else {
+      tires.sort((a, b) => {
+        if (a.axleNumber !== b.axleNumber) return a.axleNumber - b.axleNumber;
+        if (a.side !== b.side) return a.side === "left" ? -1 : 1;
+        if (a.dualPosition === "outer") return -1;
+        if (b.dualPosition === "outer") return 1;
+        return 0;
+      });
+
+      tires.forEach(tire => {
+        const display = getTireDisplayStatus(tire, vehicle);
+        let depthClass = "";
+        let pressureClass = "";
+
+        if (tire.currentDepth != null) {
+          if (tire.currentDepth <= 2) depthClass = "value-danger";
+          else if (tire.currentDepth <= 4) depthClass = "value-warning";
+        }
+        if (tire.currentPressure != null && tire.targetPressure != null) {
+          if (Math.abs(tire.targetPressure - tire.currentPressure) >= 2.0) {
+            pressureClass = "value-danger";
+          }
+        }
+
+        const depth = tire.currentDepth != null
+          ? `<strong class="${depthClass}">${tire.currentDepth} mm</strong>` : "–";
+        const pressure = tire.currentPressure != null
+          ? `<strong class="${pressureClass}">${tire.currentPressure} bar</strong>` : "–";
+        const target = tire.targetPressure != null
+          ? `<strong>${tire.targetPressure} bar</strong>` : "–";
+        const brandLine = [tire.brand, tire.type, tire.size].filter(Boolean).join(" • ") || "Geen merk/type/maat";
+        const regrooved = tire.regrooved
+          ? `<span class="badge-regrooved">Geherprofileerd</span>` : "";
+
+        tireContainer.innerHTML += `
+          <div class="tire-card" data-tire-id="${tire.id}" style="cursor:pointer">
+            <div class="tire-card-top">
+              <div class="tire-pos">${tire.positionLabel} ${regrooved}</div>
+              <span class="tire-status ${display.class}">${display.text}</span>
+            </div>
+            <div class="tire-brand">${brandLine}</div>
+            <div class="tire-info">
+              <span>Diepte: ${depth}</span>
+              <span>Druk: ${pressure}</span>
+              <span>Voorschrift: ${target}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      tireContainer.querySelectorAll(".tire-card[data-tire-id]").forEach(el => {
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = el.dataset.tireId;
+          const tire = tires.find(t => String(t.id) === String(id));
+          if (tire) openTireDetail(tire);
+        });
+      });
+    }
+  }
+
+  if (typeof renderVehicleSchematic === "function") {
+    renderVehicleSchematic(vehicle, tires);
+  }
+
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-vehicle-detail")?.classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(nav => nav.classList.remove("active"));
+}
+
 // ===== Detail page =====
 function attachVehicleClickEvents() {
   document.querySelectorAll(".vehicle-card").forEach(card => {
@@ -1090,7 +1225,10 @@ async function renderAlertsPage() {
           const icon = item.level === "danger" ? "⚠️" : "📅";
           const sub = item.position ? item.position : "";
           return `
-            <div class="alert-card ${levelClass}">
+            <div class="alert-card ${levelClass}" 
+                data-plate="${item.vehiclePlate}" 
+                data-position="${item.position || ""}"
+                style="cursor:pointer">
               <div class="alert-icon">${icon}</div>
               <div class="alert-content">
                 <strong>${item.message}</strong>
@@ -1108,6 +1246,27 @@ async function renderAlertsPage() {
       const isOpen = !body.hidden;
       body.hidden = isOpen;
       chevron.textContent = isOpen ? "▸" : "▾";
+    });
+
+    group.querySelectorAll(".alert-card").forEach(card => {
+      card.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const plate = card.dataset.plate;
+        const position = card.dataset.position;
+        if (!plate) return;
+
+        const raw = await apiGetVehicleByPlate(plate);
+        if (!raw) return;
+        const vehicle = mapVehicle(raw);
+        const tires = await getTiresCached(plate);
+
+        await openVehicleDetail(vehicle, tires);
+
+        if (position) {
+          const tire = tires.find(t => t.positionLabel === position);
+          if (tire) openTireDetail(tire);
+        }
+      });
     });
 
     container.appendChild(group);
