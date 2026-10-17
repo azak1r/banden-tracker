@@ -1,9 +1,7 @@
 // ===== PocketBase API =====
-// PC:    http://127.0.0.1:8090
-// Phone: http://192.168.x.x:8090  (same Wi‑Fi as this PC)
-const PB_URL = "https://te97luowr66c6j7.pwz5.pocketbasecloud.com";
+import PocketBase from "pocketbase";
 
-const pb = new PocketBase(PB_URL);
+const pb = new PocketBase("https://te97luowr66c6j7.pwz5.pocketbasecloud.com");
 
 // Load the PocketBase SDK (add this script tag in index.html if not already present)
 // <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.5/dist/pocketbase.umd.js"></script>
