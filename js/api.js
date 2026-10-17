@@ -218,3 +218,4 @@ async function apiDeleteHistoryForVehicle(plate) {
     await pbRequest(`collections/history/records/${row.id}`, { method: "DELETE" });
   }
 }
+
