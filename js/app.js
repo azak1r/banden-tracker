@@ -283,7 +283,7 @@ async function renderVehiclesList(filter = "") {
   const container = document.getElementById("vehicles-list");
   if (!container) return;
 
-  const vehicles = await loadVehiclesFromApi();
+  const vehicles = await getVehiclesCached();
   const q = filter.trim().toUpperCase();
 
   const filtered = q
@@ -337,7 +337,7 @@ function attachVehicleClickEvents() {
         }
 
         const vehicle = mapVehicle(raw);
-        const tires = await loadTiresFromApi(plate);
+        const tires = await getTiresCached(plate);
 
         const inspectBtn = document.getElementById("btn-new-inspection");
           if (inspectBtn) {
