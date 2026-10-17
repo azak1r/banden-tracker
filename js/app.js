@@ -1363,10 +1363,10 @@ function inspectionCountdown(vehicle) {
   if (days == null) return { level: "danger", text: "Geen inspectie", daysLeft: null };
 
   const daysLeft = 90 - days;
-  if (daysLeft <= 0) return { level: "danger", text: `${Math.abs(daysLeft)} dagen te laat`, daysLeft };
-  if (daysLeft <= 14) return { level: "danger", text: `Nog ${daysLeft} dagen`, daysLeft };
-  if (daysLeft <= 30) return { level: "warning", text: `Nog ${daysLeft} dagen`, daysLeft };
-  return { level: "good", text: `Nog ${daysLeft} dagen`, daysLeft };
+  if (daysLeft <= 0) return { level: "danger", text: `Inspectie ${Math.abs(daysLeft)} dagen te laat`, daysLeft };
+  if (daysLeft <= 14) return { level: "danger", text: `Volgende inspectie in ${daysLeft} dagen`, daysLeft };
+  if (daysLeft <= 30) return { level: "warning", text: `Volgende inspectie in ${daysLeft} dagen`, daysLeft };
+  return { level: "good", text: `Volgende inspectie in ${daysLeft} dagen`, daysLeft };
 }
 
 function getInspectionAlert(vehicle) {
