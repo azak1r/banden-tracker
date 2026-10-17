@@ -3,23 +3,44 @@
 // Phone: http://192.168.x.x:8090  (same Wi‑Fi as this PC)
 const PB_URL = "https://te97luowr66c6j7.pwz5.pocketbasecloud.com";
 
-async function pbRequest(path, options = {}) {
-  const res = await fetch(`${PB_URL}/api/${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options
-  });
+const pb = new PocketBase(PB_URL);
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`PocketBase error ${res.status}: ${text}`);
-  }
+// Load the PocketBase SDK (add this script tag in index.html if not already present)
+// <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.5/dist/pocketbase.umd.js"></script>
 
-  if (res.status === 204) return null;
-  return res.json();
+async function login(email, password) {
+  return await pb.collection("users").authWithPassword(email, password);
 }
+
+function logout() {
+  pb.authStore.clear();
+}
+
+function isLoggedIn() {
+  return pb.authStore.isValid;
+}
+
+function getCurrentUser() {
+  return pb.authStore.model;
+}
+
+// Make sure every request uses the auth token
+function authHeaders() {
+  return pb.authStore.token
+    ? { Authorization: pb.authStore.token }
+    : {};
+}
+
+async function pbRequest(path, options = {}) {
+  const headers = {
+    "Content-Type": "application/json",
+    ...authHeaders(),
+    ...(options.headers || {})
+  };
+  const res = await fetch(`${PB_URL}${path}`, { ...options, headers });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+  }
 
 // ----- Vehicles -----
 async function apiGetAllVehicles() {
@@ -196,4 +217,36 @@ async function apiDeleteHistoryForVehicle(plate) {
   for (const row of data.items || []) {
     await pbRequest(`collections/history/records/${row.id}`, { method: "DELETE" });
   }
+}
+
+function showLogin() {
+  document.getElementById("login-modal").style.display = "flex";
+}
+
+function hideLogin() {
+  document.getElementById("login-modal").style.display = "none";
+}
+
+document.getElementById("login-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  const errorEl = document.getElementById("login-error");
+
+  try {
+    await login(email, password);
+    errorEl.style.display = "none";
+    hideLogin();
+    // reload data
+    await renderVehicles();
+    await renderAlerts();
+  } catch (err) {
+    errorEl.textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord.";
+    errorEl.style.display = "block";
+  }
+});
+
+// On load: show login if not authenticated
+if (!isLoggedIn()) {
+  showLogin();
 }
