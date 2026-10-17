@@ -1292,3 +1292,12 @@ body {
 }
 .modal-content button { width: 100%; margin-top: 1rem; }
 .error { color: #f87171; font-size: 0.85rem; margin-top: 0.5rem; }
+
+.inspection-countdown {
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+.inspection-countdown.good { color: #22c55e; }
+.inspection-countdown.warning { color: #f59e0b; }
+.inspection-countdown.danger { color: #ef4444; }

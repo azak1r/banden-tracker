@@ -190,6 +190,12 @@ function bindAddVehicleButtons() {
 }
 
 function buildVehicleCard(vehicle, tires) {
+
+  const countdown = inspectionCountdown(vehicle);
+  const countdownHtml = vehicle.lastInspection
+    ? `<div class="inspection-countdown ${countdown.level}">${countdown.text}</div>`
+    : `<div class="inspection-countdown danger">Geen inspectie</div>`;
+
   const status = getVehicleStatus(tires, vehicle);
   const typeLabel =
     vehicle.type === "trekker" ? "Vrachtwagen" :
@@ -211,6 +217,7 @@ function buildVehicleCard(vehicle, tires) {
           ${typeLabel} • ${vehicle.brand || ""} ${vehicle.model || ""}
           ${vehicle.driver ? ` • ${vehicle.driver}` : ""}
         </div>
+        ${countdownHtml}
       </div>
     </div>
     <div class="vehicle-status ${status.class}">${status.text}</div>
@@ -969,6 +976,8 @@ function isInspectionOverdue(vehicle) {
 async function collectAllAlerts() {
   const vehicles = await loadVehiclesFromApi();
   const alerts = [];
+  const inspectionAlert = getInspectionAlert(vehicle);
+    if (inspectionAlert) alerts.push(inspectionAlert);
 
   for (const vehicle of vehicles) {
     if (isInspectionOverdue(vehicle)) {
@@ -1339,4 +1348,36 @@ async function updateAlertsBadge() {
     badge.hidden = false;
     badge.textContent = count > 99 ? "99+" : count;
   }
+}
+
+function daysSinceInspection(vehicle) {
+  if (!vehicle?.lastInspection) return null;
+  return Math.floor((Date.now() - new Date(vehicle.lastInspection)) / (1000 * 60 * 60 * 24));
+}
+
+function inspectionCountdown(vehicle) {
+  const days = daysSinceInspection(vehicle);
+  if (days == null) return { level: "danger", text: "Geen inspectie", daysLeft: null };
+
+  const daysLeft = 90 - days;
+  if (daysLeft <= 0) return { level: "danger", text: `${Math.abs(daysLeft)} dagen te laat`, daysLeft };
+  if (daysLeft <= 14) return { level: "danger", text: `Nog ${daysLeft} dagen`, daysLeft };
+  if (daysLeft <= 30) return { level: "warning", text: `Nog ${daysLeft} dagen`, daysLeft };
+  return { level: "good", text: `Nog ${daysLeft} dagen`, daysLeft };
+}
+
+function getInspectionAlert(vehicle) {
+  const cd = inspectionCountdown(vehicle);
+  if (cd.level === "good") return null;
+
+  return {
+    level: cd.level,
+    vehiclePlate: vehicle.plate,
+    message: cd.daysLeft == null
+      ? "Nog geen inspectie uitgevoerd"
+      : cd.daysLeft <= 0
+        ? `Inspectie ${Math.abs(cd.daysLeft)} dagen te laat`
+        : `Inspectie over ${cd.daysLeft} dagen`,
+    type: "inspection"
+  };
 }
