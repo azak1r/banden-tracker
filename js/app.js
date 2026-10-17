@@ -30,8 +30,7 @@ const navItems = document.querySelectorAll(".nav-item");
 const pages = {
   0: "page-dashboard",
   1: "page-vehicles",
-  2: "page-alerts",
-  3: "page-settings"
+  2: "page-alerts"
 };
 
 navItems.forEach((item, index) => {
