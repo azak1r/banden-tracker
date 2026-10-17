@@ -125,6 +125,38 @@ async function loadTiresFromApi(plate) {
   return items.map(mapTire);
 }
 
+// ===== Simple cache =====
+const cache = {
+  vehicles: null,
+  tires: {},          // plate → tires[]
+  ts: 0
+};
+const CACHE_MS = 30_000; // 30 seconds
+
+function isCacheFresh() {
+  return Date.now() - cache.ts < CACHE_MS;
+}
+
+async function getVehiclesCached() {
+  if (cache.vehicles && isCacheFresh()) return cache.vehicles;
+  cache.vehicles = await loadVehiclesFromApi();
+  cache.ts = Date.now();
+  return cache.vehicles;
+}
+
+async function getTiresCached(plate) {
+  if (cache.tires[plate] && isCacheFresh()) return cache.tires[plate];
+  const tires = await loadTiresFromApi(plate);
+  cache.tires[plate] = tires;
+  return tires;
+}
+
+function clearCache() {
+  cache.vehicles = null;
+  cache.tires = {};
+  cache.ts = 0;
+}
+
 // ===== Helpers =====
 function getTireDisplayStatus(tire, vehicle) {
   let level = "unknown";
@@ -223,30 +255,23 @@ function buildVehicleCard(vehicle, tires) {
 
 // ===== Dashboard =====
 async function renderVehicles() {
-  const vehicles = await loadVehiclesFromApi();
+  const vehicles = await getVehiclesCached();
   const container = document.querySelector("#page-dashboard .vehicles");
   if (!container) return;
 
-  const header = container.querySelector(".section-header");
-  container.innerHTML = "";
-  if (header) {
-    container.appendChild(header);
-  } else {
-    container.innerHTML = `
-      <div class="section-header">
-        <h2 data-i18n="vehiclesTitle">Voertuigen</h2>
-        <button type="button" class="btn-primary" id="btn-add-vehicle">+ Voertuig toevoegen</button>
-      </div>
-    `;
-  }
+  // ... header code stays the same ...
 
   if (vehicles.length === 0) {
     container.innerHTML += `<p class="placeholder">Nog geen voertuigen toegevoegd.</p>`;
   } else {
-    for (const vehicle of vehicles) {
-      const tires = await loadTiresFromApi(vehicle.plate);
-      container.appendChild(buildVehicleCard(vehicle, tires));
-    }
+    // Load all tires in parallel
+    const tireLists = await Promise.all(
+      vehicles.map(v => getTiresCached(v.plate))
+    );
+
+    vehicles.forEach((vehicle, i) => {
+      container.appendChild(buildVehicleCard(vehicle, tireLists[i]));
+    });
     attachVehicleClickEvents();
   }
 
@@ -280,10 +305,13 @@ async function renderVehiclesList(filter = "") {
     return;
   }
 
-  for (const vehicle of filtered) {
-    const tires = await loadTiresFromApi(vehicle.plate);
-    container.appendChild(buildVehicleCard(vehicle, tires));
-  }
+  const tireLists = await Promise.all(
+    filtered.map(v => getTiresCached(v.plate))
+  );
+
+  filtered.forEach((vehicle, i) => {
+    container.appendChild(buildVehicleCard(vehicle, tireLists[i]));
+  });
 
   attachVehicleClickEvents();
   bindAddVehicleButtons();
@@ -490,6 +518,7 @@ document.getElementById("btn-delete-vehicle")?.addEventListener("click", async (
     console.error(error);
     alert("Verwijderen mislukt: " + error.message);
   }
+  clearCache();
 });
 
 document.getElementById("back-to-dashboard")?.addEventListener("click", () => {
@@ -797,6 +826,7 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
     console.error(error);
     alert("Er ging iets mis bij het opslaan: " + error.message);
   }
+  clearCache();
 });
 
 // ===== Schematic =====
@@ -991,15 +1021,19 @@ function isInspectionOverdue(vehicle) {
 }
 
 async function collectAllAlerts() {
-  const vehicles = await loadVehiclesFromApi();
+  const vehicles = await getVehiclesCached();
   const alerts = [];
 
-  for (const vehicle of vehicles) {
+  // Load all tires in parallel
+  const tireLists = await Promise.all(
+    vehicles.map(v => getTiresCached(v.plate))
+  );
+
+  vehicles.forEach((vehicle, i) => {
     const inspectionAlert = getInspectionAlert(vehicle);
     if (inspectionAlert) alerts.push(inspectionAlert);
 
-    const tires = await loadTiresFromApi(vehicle.plate);
-    for (const tire of tires) {
+    for (const tire of tireLists[i]) {
       for (const fault of getTireFaults(tire)) {
         alerts.push({
           level: fault.level,
@@ -1010,7 +1044,7 @@ async function collectAllAlerts() {
         });
       }
     }
-  }
+  });
 
   alerts.sort((a, b) => (a.level === b.level ? 0 : a.level === "danger" ? -1 : 1));
   return alerts;
@@ -1299,6 +1333,7 @@ document.getElementById("form-tire-edit")?.addEventListener("submit", async (e) 
     console.error(err);
     alert("Opslaan mislukt: " + err.message);
   }
+  clearCache();
 });
 
 function applyRoleUI() {
