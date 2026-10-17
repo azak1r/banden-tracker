@@ -1,0 +1,1127 @@
+/* ===== CSS Variables ===== */
+:root {
+  --bg-body: #f5f7fa;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #64748b;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+  --accent-dark: #1e3a5f;
+}
+
+[data-theme="dark"] {
+  --bg-body: #0f172a;
+  --bg-card: #1e293b;
+  --bg-header: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --accent: #3b82f6;
+  --accent-dark: #93c5fd;
+}
+
+/* ===== Reset & base ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  line-height: 1.5;
+  padding-bottom: 70px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* ===== Header ===== */
+.header {
+  background-color: var(--bg-header);
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.theme-btn {
+  border: 1px solid var(--border);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.lang-switch {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-body);
+  padding: 3px;
+  border-radius: 8px;
+}
+
+.lang-btn {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.lang-btn.active {
+  background: var(--bg-card);
+  color: var(--accent-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ===== Main & pages ===== */
+.main {
+  padding: 20px;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.placeholder {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header h2 {
+  font-size: 1.1rem;
+  color: var(--accent-dark);
+  margin: 0;
+}
+
+.section-header.tight {
+  margin-bottom: 10px;
+}
+
+.section-header.tight h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+/* ===== Bottom nav ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--bg-header);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  padding: 6px 12px;
+}
+
+.nav-item.active {
+  color: var(--accent);
+}
+
+.nav-icon {
+  font-size: 1.3rem;
+}
+
+/* ===== Buttons ===== */
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 0.875rem;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.back-btn:hover {
+  background-color: var(--border);
+}
+
+#btn-add-vehicle {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+}
+
+.checkbox-row {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+/* ===== Status pills ===== */
+.vehicle-status,
+.tire-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.status-good,
+.tire-status.status-good {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-warning,
+.tire-status.status-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-danger,
+.status-critiek,
+.tire-status.status-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-new {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-unknown,
+.tire-status.status-unknown {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+[data-theme="dark"] .status-good,
+[data-theme="dark"] .tire-status.status-good {
+  background: #14532d;
+  color: #86efac;
+}
+
+[data-theme="dark"] .status-warning,
+[data-theme="dark"] .tire-status.status-warning {
+  background: #78350f;
+  color: #fde68a;
+}
+
+[data-theme="dark"] .status-danger,
+[data-theme="dark"] .tire-status.status-danger {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+[data-theme="dark"] .status-new {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .status-unknown,
+[data-theme="dark"] .tire-status.status-unknown {
+  background: #334155;
+  color: #cbd5e1;
+}
+
+.badge-new {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+[data-theme="dark"] .badge-new {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+.badge-regrooved {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+[data-theme="dark"] .badge-regrooved {
+  background: #78350f;
+  color: #fde68a;
+}
+
+/* ===== Alerts ===== */
+.alerts {
+  margin-bottom: 16px;
+}
+
+.alerts > h2 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: var(--accent-dark);
+}
+
+.alert-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+
+.alert-danger {
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+}
+
+.alert-warning {
+  background-color: #ffedd5;
+  border: 1px solid #fdba74;
+}
+
+[data-theme="dark"] .alert-danger {
+  background-color: #450a0a;
+  border: 1px solid #7f1d1d;
+}
+
+[data-theme="dark"] .alert-warning {
+  background-color: #451a03;
+  border: 1px solid #9a3412;
+}
+
+.alert-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.alert-content strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+}
+
+.alert-content p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .alert-danger .alert-content strong {
+  color: #fecaca;
+}
+
+[data-theme="dark"] .alert-warning .alert-content strong {
+  color: #fdba74;
+}
+
+/* ===== Vehicle cards ===== */
+.vehicle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  transition: transform 0.1s;
+}
+
+.vehicle-card:active {
+  transform: scale(0.99);
+}
+
+.vehicle-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.vehicle-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-body);
+  border-radius: 10px;
+}
+
+.vehicle-plate {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vehicle-type {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== Search ===== */
+.search-box {
+  margin-bottom: 16px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.search-box input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ===== Vehicle detail ===== */
+.detail-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+#page-vehicle-detail .back-btn {
+  margin-bottom: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.detail-header-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent 55%),
+    var(--bg-card);
+  border: none;
+  border-radius: 14px;
+  padding: 20px 18px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="dark"] .detail-header-card {
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.15), transparent 55%),
+    var(--bg-card);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.detail-header-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--accent), #60a5fa);
+  border-radius: 14px 0 0 14px;
+}
+
+.detail-plate-large {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.detail-type {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.detail-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
+.detail-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.summary-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--bg-body);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.summary-chip.good {
+  color: #166534;
+  border-color: #86efac;
+  background: #dcfce7;
+}
+
+.summary-chip.warning {
+  color: #92400e;
+  border-color: #fcd34d;
+  background: #fef3c7;
+}
+
+.summary-chip.danger {
+  color: #991b1b;
+  border-color: #fca5a5;
+  background: #fee2e2;
+}
+
+.summary-chip.total {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .summary-chip.good {
+  background: #14532d;
+  color: #86efac;
+  border-color: #166534;
+}
+
+[data-theme="dark"] .summary-chip.warning {
+  background: #78350f;
+  color: #fde68a;
+  border-color: #92400e;
+}
+
+[data-theme="dark"] .summary-chip.danger {
+  background: #7f1d1d;
+  color: #fecaca;
+  border-color: #991b1b;
+}
+
+#page-vehicle-detail .detail-actions .btn-primary {
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+#page-vehicle-detail .detail-actions .btn-danger {
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+}
+
+/* ===== Schematic ===== */
+.vehicle-schematic {
+  background:
+    radial-gradient(ellipse at center, rgba(51, 65, 85, 0.35), transparent 70%),
+    var(--bg-card);
+  border: none;
+  border-radius: 14px;
+  padding: 16px 12px 12px;
+  margin-bottom: 16px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="dark"] .vehicle-schematic {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.schematic-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vehicle-schematic svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.schematic-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.schematic-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.schematic-tire:hover rect:first-child {
+  filter: brightness(1.15);
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  display: inline-block;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== Tire cards (list) ===== */
+.tire-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: none;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.tire-card:active {
+  transform: scale(0.99);
+}
+
+[data-theme="dark"] .tire-card {
+  background: #1e293b;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+}
+
+.tire-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tire-pos {
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: 0.1px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tire-brand {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  opacity: 0.9;
+}
+
+.tire-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-top: 2px;
+}
+
+.tire-info span {
+  background: var(--bg-body);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+[data-theme="dark"] .tire-info span {
+  background: rgba(15, 23, 42, 0.65);
+}
+
+.tire-info strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.tire-info .value-danger {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.tire-info .value-warning {
+  color: #d97706;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .tire-info .value-danger {
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .tire-info .value-warning {
+  color: #fcd34d;
+}
+
+/* ===== Forms ===== */
+.form-divider {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.form-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+}
+
+.add-vehicle-form label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.add-vehicle-form input:not([type="checkbox"]):not([type="radio"]),
+.add-vehicle-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.add-vehicle-form input[type="checkbox"] {
+  width: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.axle-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+  background: var(--bg-body);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.axle-row select {
+  flex: 1;
+}
+
+.axle-row .btn-secondary {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+/* ===== Inspection form cards ===== */
+.inspection-tire-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.inspection-tire-card h4 {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: var(--accent-dark);
+}
+
+.inspection-tire-card .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.inspection-tire-card label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.inspection-tire-card input[type="text"],
+.inspection-tire-card input[type="number"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+/* ===== Tire detail page ===== */
+.tire-detail-header {
+  margin-bottom: 14px;
+}
+
+.tire-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tire-detail-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.tire-svg-icon {
+  display: block;
+}
+
+.tire-detail-title h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.tire-detail-brand-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.tire-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.metric-value.warn {
+  color: #d97706;
+}
+
+.metric-value.danger {
+  color: #dc2626;
+}
+
+.metric-value.good {
+  color: #16a34a;
+}
+
+.metric-hint {
+  font-size: 0.75rem;
+  margin-top: 6px;
+  color: var(--text-secondary);
+}
+
+.tire-meta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.regroove-banner {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  color: #9a3412;
+}
+
+[data-theme="dark"] .regroove-banner {
+  background: #451a03;
+  border-color: #9a3412;
+  color: #fdba74;
+}
+
+.regroove-banner strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.regroove-banner p {
+  font-size: 0.85rem;
+  margin: 0;
+  opacity: 0.95;
+}
+
+.history-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-date {
+  min-width: 88px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.history-body {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.add-vehicle-form select,
+.add-vehicle-form input {
+  width: 100%;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* keep form from being clipped oddly */
+#page-add-vehicle {
+  overflow: visible;
+}
+
+.main {
+  overflow-x: hidden;
+}
+
+/* Force visible Geherprofileerd checkbox */
+#page-tire-edit .checkbox-row {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+#page-tire-edit .checkbox-row input[type="checkbox"] {
+  -webkit-appearance: checkbox !important;
+  appearance: checkbox !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 2px solid var(--accent) !important;
+  border-radius: 4px !important;
+  background: var(--bg-body) !important;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#page-tire-edit .checkbox-row input[type="checkbox"]:checked {
+  background: var(--accent) !important;
+}

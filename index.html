@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+  <title>Banden Tracker</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-top">
+      <h1 class="app-title">Banden Tracker</h1>
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-btn" title="Thema wisselen">🌙</button>
+        <div class="lang-switch">
+          <button class="lang-btn active" data-lang="nl">NL</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+      </div>
+    </div>
+    <p class="header-subtitle">Overzicht van uw vloot en bandenstatus</p>
+  </header>
+
+  <main class="main">
+
+    <!-- Dashboard -->
+    <section id="page-dashboard" class="page active">
+      <section class="alerts">
+        <h2 data-i18n="alertsTitle">Meldingen</h2>
+      </section>
+
+      <section class="vehicles">
+        <div class="section-header">
+          <h2 data-i18n="vehiclesTitle">Voertuigen</h2>
+          <button class="btn-primary" id="btn-add-vehicle">+ Voertuig toevoegen</button>
+        </div>
+      </section>
+    </section>
+
+    <!-- Vehicles list -->
+    <section id="page-vehicles" class="page">
+      <div class="section-header">
+        <h2 data-i18n="vehiclesTitle">Voertuigen</h2>
+        <button class="btn-primary" id="btn-add-vehicle-list">+ Toevoegen</button>
+      </div>
+      <div class="search-box">
+        <input type="search" id="vehicle-search" placeholder="Zoek op kenteken..." autocomplete="off">
+      </div>
+      <div id="vehicles-list"></div>
+    </section>
+
+    <!-- Alerts -->
+    <section id="page-alerts" class="page">
+      <h2 data-i18n="alertsTitle">Meldingen</h2>
+      <div id="alerts-full-list">
+        <p class="placeholder">Hier komen later alle openstaande meldingen.</p>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section id="page-settings" class="page">
+      <h2 data-i18n="navSettings">Instellingen</h2>
+      <p class="placeholder">Hier komen later de instellingen (taal, rollen, server, etc.).</p>
+    </section>
+
+    <!-- Vehicle detail -->
+    <section id="page-vehicle-detail" class="page">
+      <div class="detail-topbar">
+        <button class="back-btn" id="back-to-dashboard">← Terug</button>
+        <div class="detail-actions">
+          <button class="btn-primary btn-sm" id="btn-new-inspection">Inspectie</button>
+          <button class="btn-danger btn-sm" id="btn-delete-vehicle">Verwijder</button>
+        </div>
+      </div>
+
+      <div class="detail-header-card">
+        <div class="detail-header-main">
+          <div class="detail-plate-large" id="detail-plate">–</div>
+          <div class="detail-type" id="detail-type">–</div>
+          <div class="detail-meta" id="detail-meta"></div>
+        </div>
+        <div class="detail-summary" id="detail-summary"></div>
+      </div>
+
+      <div id="vehicle-schematic" class="vehicle-schematic"></div>
+
+      <section class="tire-positions">
+        <div class="section-header tight">
+          <h3 id="tire-section-title">Bandposities</h3>
+        </div>
+      </section>
+    </section>
+
+    <!-- Add vehicle -->
+    <section id="page-add-vehicle" class="page">
+      <button class="back-btn" id="back-from-add">← Terug</button>
+      <h2>Nieuw voertuig toevoegen</h2>
+
+      <form id="form-add-vehicle" class="add-vehicle-form">
+        <label for="new-plate">Kenteken</label>
+        <input type="text" id="new-plate" placeholder="12-ABC-3" required>
+
+        <label for="new-type">Type voertuig</label>
+        <select id="new-type" required>
+          <option value="trekker">Trekker / Vrachtwagen</option>
+          <option value="oplegger">Oplegger</option>
+          <option value="aanhangwagen">Aanhangwagen</option>
+        </select>
+
+        <label for="new-brand">Merk</label>
+        <input type="text" id="new-brand" placeholder="MAN, DAF, Scania, Renault...">
+
+        <label for="new-model">Model</label>
+        <input type="text" id="new-model" placeholder="TGX 18.510">
+
+        <hr class="form-divider">
+
+        <h3>Assen configuratie</h3>
+        <div id="axles-builder"></div>
+
+        <button type="button" id="btn-add-axle" class="btn-secondary" style="margin-top: 12px; width: 100%;">
+          + As toevoegen
+        </button>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" style="flex: 1;">Voertuig opslaan</button>
+          <button type="button" id="cancel-add-vehicle" class="btn-secondary">Annuleren</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Inspection -->
+    <section id="page-initial-inspection" class="page">
+      <button class="back-btn" id="back-from-inspection">← Terug</button>
+      <h2 id="inspection-title">Inspectie</h2>
+      <p id="inspection-vehicle-info" class="header-subtitle"></p>
+      <div id="inspection-tires-list"></div>
+      <div class="form-actions">
+        <button id="save-initial-inspection" class="btn-primary" style="flex: 1;">Opslaan</button>
+      </div>
+    </section>
+
+    <!-- Tire detail -->
+    <section id="page-tire-detail" class="page">
+      <div class="detail-topbar">
+        <button class="back-btn" id="back-from-tire">← Terug</button>
+        <button class="btn-primary btn-sm" id="btn-edit-tire">Bewerken</button>
+      </div>
+
+      <div class="tire-detail-header">
+        <div class="tire-detail-title">
+          <div class="tire-detail-icon" aria-hidden="true">
+            <svg class="tire-svg-icon" viewBox="0 0 64 64" width="36" height="36">
+              <circle cx="32" cy="32" r="28" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+              <circle cx="32" cy="32" r="28" fill="none" stroke="#334155" stroke-width="5"/>
+              <circle cx="32" cy="32" r="22" fill="none" stroke="#475569" stroke-width="2"/>
+              <circle cx="32" cy="32" r="17" fill="#0f172a" stroke="#64748b" stroke-width="1.5"/>
+              <circle cx="32" cy="32" r="11" fill="#94a3b8"/>
+              <circle cx="32" cy="32" r="6" fill="#e2e8f0"/>
+              <circle cx="32" cy="32" r="2.5" fill="#334155"/>
+              <g stroke="#64748b" stroke-width="2" stroke-linecap="round">
+                <line x1="32" y1="21" x2="32" y2="25"/>
+                <line x1="32" y1="39" x2="32" y2="43"/>
+                <line x1="21" y1="32" x2="25" y2="32"/>
+                <line x1="39" y1="32" x2="43" y2="32"/>
+              </g>
+            </svg>
+          </div>
+          <div>
+            <h2 id="tire-detail-name">–</h2>
+            <p id="tire-detail-pos" class="header-subtitle"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tire-detail-brand-card">
+        <div id="tire-detail-brand">–</div>
+        <div id="tire-detail-size" class="header-subtitle"></div>
+      </div>
+
+      <div class="tire-metrics">
+        <div class="metric-card" id="metric-depth">
+          <div class="metric-label">Profieldiepte</div>
+          <div class="metric-value" id="tire-detail-depth">–</div>
+          <div class="metric-hint" id="tire-detail-depth-hint"></div>
+        </div>
+        <div class="metric-card" id="metric-pressure">
+          <div class="metric-label">Druk</div>
+          <div class="metric-value" id="tire-detail-pressure">–</div>
+          <div class="metric-hint" id="tire-detail-pressure-hint"></div>
+        </div>
+      </div>
+
+      <div class="tire-meta-row">
+        <div>
+          <div class="metric-label">Voorschrift</div>
+          <div id="tire-detail-target">–</div>
+        </div>
+        <div>
+          <div class="metric-label">Montage</div>
+          <div id="tire-detail-installed">–</div>
+        </div>
+      </div>
+
+      <div id="tire-regroove-banner" class="regroove-banner" hidden>
+        <strong>Regrooven mogelijk</strong>
+        <p>Profiel is nog voldoende voor regrooven op deze positie.</p>
+      </div>
+
+      <section class="tire-history-section">
+        <div class="section-header tight">
+          <h3>Meetgeschiedenis</h3>
+        </div>
+        <div id="tire-history-list">
+          <p class="placeholder">Geen metingen gevonden.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- Tire edit -->
+    <section id="page-tire-edit" class="page">
+      <button class="back-btn" id="back-from-tire-edit">← Terug</button>
+      <h2>Band bewerken</h2>
+      <p id="tire-edit-subtitle" class="header-subtitle"></p>
+
+      <form id="form-tire-edit" class="add-vehicle-form">
+        <label for="edit-tire-brand">Merk</label>
+        <input type="text" id="edit-tire-brand" placeholder="Continental, Michelin, Goodyear...">
+
+        <label for="edit-tire-type">Type</label>
+        <input type="text" id="edit-tire-type" placeholder="EQ Max S, HD Hybrid...">
+
+        <label for="edit-tire-size">Maat</label>
+        <input type="text" id="edit-tire-size" placeholder="315/70 R22.5">
+
+        <label for="edit-tire-depth">Profieldiepte (mm)</label>
+        <input type="number" id="edit-tire-depth" step="0.1" min="0" max="30" placeholder="0.0">
+
+        <label for="edit-tire-pressure">Gemeten druk (bar)</label>
+        <input type="number" id="edit-tire-pressure" step="0.1" min="0" max="15" placeholder="0.0">
+
+        <label for="edit-tire-target">Voorschrift druk (bar)</label>
+        <input type="number" id="edit-tire-target" step="0.1" min="0" max="15" placeholder="0.0">
+
+        <label for="edit-tire-installed">Montagdatum</label>
+        <input type="date" id="edit-tire-installed">
+
+        <label for="edit-tire-km">Kilometers bij montage</label>
+        <input type="number" id="edit-tire-km" min="0" step="1" placeholder="0">
+
+        <label class="checkbox-row" for="edit-tire-regrooved">
+          <input type="checkbox" id="edit-tire-regrooved">
+          <span>Geherprofileerd</span>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" style="flex:1">Opslaan</button>
+          <button type="button" id="cancel-tire-edit" class="btn-secondary">Annuleren</button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" type="button">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-item" type="button">
+      <span class="nav-icon">🚛</span>
+      <span class="nav-label">Voertuigen</span>
+    </button>
+    <button class="nav-item" type="button">
+      <span class="nav-icon">🔔</span>
+      <span class="nav-label">Meldingen</span>
+    </button>
+    <button class="nav-item" type="button">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Instellingen</span>
+    </button>
+  </nav>
+
+  <script src="js/api.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
