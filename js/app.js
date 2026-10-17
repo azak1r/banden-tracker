@@ -4,6 +4,8 @@ async function initApp() {
     return;
   }
 
+  applyRoleUI();
+
   try {
     await renderVehicles();
     await renderAlerts();
@@ -1231,3 +1233,42 @@ document.getElementById("form-tire-edit")?.addEventListener("submit", async (e) 
     alert("Opslaan mislukt: " + err.message);
   }
 });
+
+function applyRoleUI() {
+  const user = getCurrentUser();
+  const isAdmin = user?.role === "admin";
+
+  // Hide delete button for non-admins
+  const deleteBtn = document.getElementById("btn-delete-vehicle");
+  if (deleteBtn) {
+    deleteBtn.style.display = isAdmin ? "" : "none";
+  }
+}
+
+function showLogin() {
+  document.getElementById("login-modal").style.display = "flex";
+}
+
+function hideLogin() {
+  document.getElementById("login-modal").style.display = "none";
+}
+
+document.getElementById("login-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  const errorEl = document.getElementById("login-error");
+
+  try {
+    await login(email, password);
+    errorEl.style.display = "none";
+    hideLogin();
+    applyRoleUI();
+    await renderVehicles();
+    await renderAlerts();
+  } catch (err) {
+    errorEl.textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord.";
+    errorEl.style.display = "block";
+  }
+});
+

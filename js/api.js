@@ -218,35 +218,3 @@ async function apiDeleteHistoryForVehicle(plate) {
     await pbRequest(`collections/history/records/${row.id}`, { method: "DELETE" });
   }
 }
-
-function showLogin() {
-  document.getElementById("login-modal").style.display = "flex";
-}
-
-function hideLogin() {
-  document.getElementById("login-modal").style.display = "none";
-}
-
-document.getElementById("login-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value;
-  const errorEl = document.getElementById("login-error");
-
-  try {
-    await login(email, password);
-    errorEl.style.display = "none";
-    hideLogin();
-    // reload data
-    await renderVehicles();
-    await renderAlerts();
-  } catch (err) {
-    errorEl.textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord.";
-    errorEl.style.display = "block";
-  }
-});
-
-// On load: show login if not authenticated
-if (!isLoggedIn()) {
-  showLogin();
-}
