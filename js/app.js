@@ -1402,3 +1402,18 @@ function getInspectionAlert(vehicle) {
     type: "inspection"
   };
 }
+
+async function showAppVersion() {
+  try {
+    const res = await fetch("/banden-tracker/version.json?ts=" + Date.now());
+    const data = await res.json();
+    const el = document.getElementById("app-version");
+    if (el && data.version) {
+      el.textContent = "v" + data.version;
+    }
+  } catch (e) {
+    console.warn("Could not load version", e);
+  }
+}
+
+showAppVersion();
