@@ -123,18 +123,31 @@ async function loadTiresFromApi(plate) {
 }
 
 // ===== Helpers =====
-function getTireDisplayStatus(tire) {
+function getTireDisplayStatus(tire, vehicle) {
+  // No inspection done for this vehicle → unknown
+  if (vehicle && !vehicle.lastInspection) {
+    return { class: "status-unknown", text: "Onbekend", level: "unknown" };
+  }
+
   let level = "unknown";
 
-  if (tire.currentDepth != null) {
+  if (tire.currentDepth != null && tire.currentDepth > 0) {
     if (tire.currentDepth <= 2) level = "danger";
     else if (tire.currentDepth <= 4) level = "warning";
     else level = "good";
   }
 
-  if (tire.currentPressure != null && tire.targetPressure != null) {
+  if (
+    tire.currentPressure != null && tire.currentPressure > 0 &&
+    tire.targetPressure != null && tire.targetPressure > 0
+  ) {
     const diff = Math.abs(tire.targetPressure - tire.currentPressure);
     if (diff >= 2.0) level = "danger";
+  }
+
+  // Still no real data after an inspection → keep unknown
+  if (level === "unknown" && (!tire.currentDepth || tire.currentDepth === 0)) {
+    return { class: "status-unknown", text: "Onbekend", level: "unknown" };
   }
 
   const text =
@@ -154,7 +167,7 @@ function getVehicleStatus(tires, vehicle) {
   let hasData = false;
 
   for (const tire of tires) {
-    const display = getTireDisplayStatus(tire);
+    const display = getTireDisplayStatus((tire, vehicle);
     if (display.level === "unknown") continue;
     hasData = true;
     if (display.level === "danger") hasDanger = true;
@@ -356,7 +369,7 @@ function attachVehicleClickEvents() {
           });
 
           tires.forEach(tire => {
-            const display = getTireDisplayStatus(tire);
+            const display = getTireDisplayStatus((tire, vehicle);
             let depthClass = "";
             let pressureClass = "";
 
@@ -769,13 +782,13 @@ function renderVehicleSchematic(vehicle, tires) {
   }
 
   function statusColor(tire) {
-    if (!tire) return "#64748b";
-    const level = getTireDisplayStatus(tire).level;
-    if (level === "good") return "#22c55e";
-    if (level === "warning") return "#f59e0b";
-    if (level === "danger") return "#ef4444";
-    return "#64748b";
-  }
+  if (!tire) return "#64748b";
+  const level = getTireDisplayStatus(tire, vehicle).level;
+  if (level === "good") return "#22c55e";
+  if (level === "warning") return "#f59e0b";
+  if (level === "danger") return "#ef4444";
+  return "#64748b"; // unknown
+}
 
   function findTire(axleNumber, side, dualPosition) {
     return tires.find(t =>
