@@ -1301,3 +1301,9 @@ body {
 .inspection-countdown.good { color: #22c55e; }
 .inspection-countdown.warning { color: #f59e0b; }
 .inspection-countdown.danger { color: #ef4444; }
+
+.btn-disabled,
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

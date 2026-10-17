@@ -315,6 +315,20 @@ function attachVehicleClickEvents() {
         const vehicle = mapVehicle(raw);
         const tires = await loadTiresFromApi(plate);
 
+        const inspectBtn = document.getElementById("btn-new-inspection");
+          if (inspectBtn) {
+            const cd = inspectionCountdown(vehicle);
+            const canInspect = cd.daysLeft == null || cd.daysLeft <= 30;
+
+            inspectBtn.disabled = !canInspect;
+            inspectBtn.title = canInspect
+              ? "Inspectie starten"
+              : `Inspectie nog niet nodig (nog ${cd.daysLeft} dagen)`;
+
+            // Optional visual style
+            inspectBtn.classList.toggle("btn-disabled", !canInspect);
+          }
+
         document.getElementById("detail-plate").textContent = vehicle.plate;
 
         const typeLabel =
@@ -684,6 +698,13 @@ async function openInspectionForm(plate, mode = "initial") {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById("page-initial-inspection").classList.add("active");
 }
+
+document.getElementById("btn-inspect")?.addEventListener("click", () => {
+  const plate = document.getElementById("detail-plate").textContent.trim();
+  // re-check in case the page was open a long time
+  // (optional but safer)
+  openInspectionForm(plate);
+});
 
 document.getElementById("btn-new-inspection")?.addEventListener("click", () => {
   const plate = document.getElementById("detail-plate").textContent.trim().toUpperCase();
