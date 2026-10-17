@@ -167,7 +167,7 @@ function getVehicleStatus(tires, vehicle) {
   let hasData = false;
 
   for (const tire of tires) {
-    const display = getTireDisplayStatus((tire, vehicle);
+    const display = getTireDisplayStatus(tire, vehicle);
     if (display.level === "unknown") continue;
     hasData = true;
     if (display.level === "danger") hasDanger = true;
@@ -369,7 +369,7 @@ function attachVehicleClickEvents() {
           });
 
           tires.forEach(tire => {
-            const display = getTireDisplayStatus((tire, vehicle);
+            const display = getTireDisplayStatus(tire, vehicle);
             let depthClass = "";
             let pressureClass = "";
 
