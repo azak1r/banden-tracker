@@ -800,6 +800,28 @@ document.getElementById("back-from-inspection")?.addEventListener("click", () =>
 });
 
 document.getElementById("save-initial-inspection")?.addEventListener("click", async () => {
+  // Require all three depth points + pressure
+  const depthCards = document.querySelectorAll(".inspection-tire-card");
+  const missing = [];
+
+  depthCards.forEach(card => {
+    const inside = card.querySelector("[data-field='depthInside']")?.value;
+    const middle = card.querySelector("[data-field='depthMiddle']")?.value;
+    const outside = card.querySelector("[data-field='depthOutside']")?.value;
+    const pressure = card.querySelector("[data-field='pressure']")?.value;
+    const label = card.querySelector("h4")?.textContent || "Band";
+
+    if (!inside || !middle || !outside || !pressure) {
+      missing.push(label);
+    }
+  });
+
+  if (missing.length) {
+    alert("Vul alle drie de dieptemetingen en de druk in voor:\n\n" + missing.join("\n"));
+    return;
+  }
+
+
   if (!currentInspectionPlate) {
     alert("Geen voertuig geselecteerd");
     return;
