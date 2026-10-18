@@ -176,8 +176,17 @@ function getTireDisplayStatus(tire, vehicle) {
     tire.currentPressure != null && tire.currentPressure > 0 &&
     tire.targetPressure != null && tire.targetPressure > 0
   ) {
-    const diff = Math.abs(tire.targetPressure - tire.currentPressure);
-    if (diff >= 2.0) level = "danger";
+    const diff = tire.currentPressure - tire.targetPressure;
+    const absDiff = Math.abs(diff);
+    const percentLow = (tire.targetPressure - tire.currentPressure) / tire.targetPressure;
+
+    if (absDiff >= 2.0 || percentLow >= 0.20) {
+      level = "danger";
+    } else if (diff <= -0.1) {
+      level = "warning"; // too low
+    } else if (diff >= 1.0) {
+      level = "warning"; // too high
+    }
   }
 
   // Still no real data after an inspection → keep unknown
@@ -814,6 +823,18 @@ async function openInspectionForm(plate, mode = "initial") {
           </label>
         </div>
       </div>
+      <div class="form-row">
+        <div style="grid-column:1 / -1">
+          <label>Opmerking</label>
+          <textarea class="tire-notes" rows="2" placeholder="Schade, ventiel, velg..." style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--bg-body);color:var(--text-primary)"></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Foto</label>
+          <input type="file" class="tire-photo" accept="image/*" style="width:100%">
+        </div>
+      </div>
     `;
     container.appendChild(card);
   });
@@ -986,6 +1007,8 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
       const pressureVal = card.querySelector(".tire-pressure")?.value || "";
       const targetVal = card.querySelector(".tire-target")?.value || "";
       const regrooved = !!card.querySelector(".tire-regrooved")?.checked;
+      const notes = card.querySelector(".tire-notes")?.value.trim() || "";
+      const photoFile = card.querySelector(".tire-photo")?.files?.[0] || null;
 
       const inside = parseFloat(card.querySelector("[data-field='depthInside']")?.value) || null;
       const middle = parseFloat(card.querySelector("[data-field='depthMiddle']")?.value) || null;
@@ -1014,7 +1037,7 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
 
       const display = getTireDisplayStatus({
         ...tire,
-        currentDepth: depth,
+        currentDepth,
         currentPressure: pressure,
         targetPressure
       });
@@ -1035,16 +1058,29 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
         installedAt: tire.installedAt || new Date().toISOString()
       });
 
+      const historyNotes = [notes, regrooved ? "Geherprofileerd" : ""].filter(Boolean).join(" • ");
       await apiAddHistory({
         tireId: tire.id,
         vehiclePlate: currentInspectionPlate,
         date: new Date().toISOString(),
-        depth,
+        depth: currentDepth,
         pressure,
         type: inspectionMode === "initial" ? "initial" : "inspection",
-        notes: regrooved ? "Geherprofileerd" : "",
+        notes: historyNotes,
         regrooved
       });
+      // Photo upload (if present) — requires a file field named "photo" on the history collection
+      if (photoFile) {
+        try {
+          const form = new FormData();
+          form.append("photo", photoFile);
+          // Note: this assumes apiAddHistory returns the created record with an id
+          // For now we just log; full upload needs the record id
+          console.log("Photo ready for upload:", photoFile.name);
+        } catch (e) {
+          console.warn("Photo upload skipped", e);
+        }
+      }
     }
 
     const raw = await apiGetVehicleByPlate(currentInspectionPlate);
@@ -1243,12 +1279,27 @@ function getTireFaults(tire) {
   }
 
   if (tire.currentPressure != null && tire.targetPressure != null) {
-    const diff = Math.abs(tire.targetPressure - tire.currentPressure);
-    if (diff >= 2.0) {
+    const diff = tire.currentPressure - tire.targetPressure;
+    const absDiff = Math.abs(diff);
+    const percentLow = (tire.targetPressure - tire.currentPressure) / tire.targetPressure;
+
+    if (absDiff >= 2.0 || percentLow >= 0.20) {
       faults.push({
         level: "danger",
         type: "pressure",
-        message: t("pressureDiff", { p: tire.currentPressure, t: tire.targetPressure })
+        message: `Druk ${tire.currentPressure} bar (voorschrift ${tire.targetPressure}) — controleer op lek`
+      });
+    } else if (diff <= -0.1) {
+      faults.push({
+        level: "warning",
+        type: "pressure",
+        message: `Druk te laag (${tire.currentPressure} bar, voorschrift ${tire.targetPressure}) — oppompen`
+      });
+    } else if (diff >= 1.0) {
+      faults.push({
+        level: "warning",
+        type: "pressure",
+        message: `Druk te hoog (${tire.currentPressure} bar, voorschrift ${tire.targetPressure}) — druk verlagen`
       });
     }
   }
