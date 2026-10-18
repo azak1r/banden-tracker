@@ -941,7 +941,7 @@ document.getElementById("back-from-inspection")?.addEventListener("click", () =>
 
 document.getElementById("save-initial-inspection")?.addEventListener("click", async () => {
   // Require all three depth points + pressure
-  const depthCards = document.querySelectorAll(".inspection-tire-card");
+  const depthCards = document.querySelectorAll(".inspection-tire-card:not(#bulk-apply-box)");
   const missing = [];
 
   depthCards.forEach(card => {
@@ -969,7 +969,7 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
     return;
   }
 
-  const cards = document.querySelectorAll(".inspection-tire-card");
+  const cards = document.querySelectorAll(".inspection-tire-card:not(#bulk-apply-box)");
   if (cards.length === 0) {
     alert("Geen banden gevonden");
     return;
