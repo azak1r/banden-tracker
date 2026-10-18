@@ -181,16 +181,16 @@ function getTireDisplayStatus(tire, vehicle) {
   }
 
   const text =
-    level === "danger" ? "Actie nodig" :
-    level === "warning" ? "Let op" :
-    level === "good" ? "Goed" : "Onbekend";
+    level === "danger" ? t("statusDanger") :
+    level === "warning" ? t("statusWarning") :
+    level === "good" ? t("statusGood") : t("statusUnknown");
 
   return { class: `status-${level}`, text, level };
 }
 
 function getVehicleStatus(tires, vehicle) {
-  if (!vehicle?.lastInspection) return { class: "status-new", text: "Nieuw" };
-  if (!tires || tires.length === 0) return { class: "status-new", text: "Nieuw" };
+  if (!vehicle?.lastInspection) return { class: "status-new", text: t("statusNew") };
+  if (!tires || tires.length === 0) return { class: "status-new", text: t("statusNew") };
 
   let hasDanger = false;
   let hasWarning = false;
@@ -204,10 +204,10 @@ function getVehicleStatus(tires, vehicle) {
     if (display.level === "warning") hasWarning = true;
   }
 
-  if (!hasData) return { class: "status-new", text: "Nieuw" };
-  if (hasDanger) return { class: "status-danger", text: "Kritiek" };
-  if (hasWarning) return { class: "status-warning", text: "Let op" };
-  return { class: "status-good", text: "Goed" };
+  if (!hasData) return { class: "status-new", text: t("statusNew") };
+  if (hasDanger) return { class: "status-danger", text: t("statusCritical") };
+  if (hasWarning) return { class: "status-warning", text: t("statusWarning") };
+  return { class: "status-good", text: t("statusGood") };
 }
 
 function bindAddVehicleButtons() {
@@ -262,7 +262,7 @@ async function renderVehicles() {
   // ... header code stays the same ...
 
   if (vehicles.length === 0) {
-    container.innerHTML += `<p class="placeholder">Nog geen voertuigen toegevoegd.</p>`;
+    container.innerHTML += `<p class="placeholder">${t("noVehicles")}</p>`;
   } else {
     // Load all tires in parallel
     const tireLists = await Promise.all(
@@ -300,7 +300,7 @@ async function renderVehiclesList(filter = "") {
   if (filtered.length === 0) {
     container.innerHTML = q
       ? `<p class="placeholder">Geen voertuigen gevonden voor “${filter.trim()}”.</p>`
-      : `<p class="placeholder">Nog geen voertuigen toegevoegd.</p>`;
+      : `<p class="placeholder">${t("noVehicles")}</p>`;
     bindAddVehicleButtons();
     return;
   }
@@ -342,7 +342,7 @@ async function openVehicleDetail(vehicle, tires) {
 
   const driverText = document.getElementById("detail-driver-text");
     if (driverText) {
-      driverText.textContent = vehicle.driver || "Geen chauffeur";
+      driverText.textContent = vehicle.driver || t("noDriver");
     }
 
   document.getElementById("detail-type").textContent =
@@ -371,7 +371,7 @@ document.getElementById("btn-save-driver")?.addEventListener("click", async () =
   await apiUpdateVehicle(raw.id, { driver: newDriver });
   clearCache();
 
-  document.getElementById("detail-driver-text").textContent = newDriver || "Geen chauffeur";
+  document.getElementById("detail-driver-text").textContent = newDriver || t("noDriver");
   document.getElementById("driver-edit-form").hidden = true;
 
   // Refresh the card lists
@@ -420,7 +420,7 @@ document.getElementById("btn-save-driver")?.addEventListener("click", async () =
     `;
 
     if (tires.length === 0) {
-      tireContainer.innerHTML += `<p class="placeholder">Nog geen banden geregistreerd.</p>`;
+      tireContainer.innerHTML += `<p class="placeholder">${t("noTires")}</p>`;
     } else {
       tires.sort((a, b) => {
         if (a.axleNumber !== b.axleNumber) return a.axleNumber - b.axleNumber;
@@ -1022,15 +1022,15 @@ function getTireFaults(tire) {
       faults.push({
         level: "danger",
         type: "tread",
-        message: `Profieldiepte te laag (${tire.currentDepth} mm) — vervangen geadviseerd`
+        message: t("depthLow", { n: tire.currentDepth })
       });
     } else if (tire.currentDepth <= 4) {
       faults.push({
         level: "warning",
         type: "tread",
         message: tire.canRegroove
-          ? `Profieldiepte laag (${tire.currentDepth} mm) — regrooven mogelijk`
-          : `Profieldiepte laag (${tire.currentDepth} mm) — binnenkort vervangen`
+          ? t("depthWarnRegroove", { n: tire.currentDepth })
+          : t("depthWarn", { n: tire.currentDepth })
       });
     }
   }
@@ -1041,7 +1041,7 @@ function getTireFaults(tire) {
       faults.push({
         level: "danger",
         type: "pressure",
-        message: `Grote drukafwijking (${tire.currentPressure} bar, voorschrift ${tire.targetPressure} bar) — controleer op lekke band`
+        message: t("pressureDiff", { p: tire.currentPressure, t: tire.targetPressure })
       });
     }
   }
@@ -1090,10 +1090,10 @@ async function renderAlertsPage() {
   if (!container) return;
 
   const alerts = await collectAllAlerts();
-  container.innerHTML = `<h2>Meldingen</h2>`;
+  container.innerHTML = `<h2>${t("alertsTitle")}</h2>`;
 
   if (alerts.length === 0) {
-    container.innerHTML += `<p class="placeholder">Geen openstaande meldingen. Alles in orde.</p>`;
+    container.innerHTML += `<p class="placeholder">${t("noAlerts")}</p>`;
     return;
   }
 
@@ -1455,13 +1455,13 @@ function daysSinceInspection(vehicle) {
 
 function inspectionCountdown(vehicle) {
   const days = daysSinceInspection(vehicle);
-  if (days == null) return { level: "danger", text: "Geen inspectie", daysLeft: null };
+  if (days == null) return { level: "danger", text: t("noInspection"), daysLeft: null };
 
   const daysLeft = 90 - days;
-  if (daysLeft <= 0) return { level: "danger", text: `Inspectie ${Math.abs(daysLeft)} dagen te laat`, daysLeft };
-  if (daysLeft <= 14) return { level: "danger", text: `Volgende inspectie in ${daysLeft} dagen`, daysLeft };
-  if (daysLeft <= 30) return { level: "warning", text: `Volgende inspectie in ${daysLeft} dagen`, daysLeft };
-  return { level: "good", text: `Volgende inspectie in ${daysLeft} dagen`, daysLeft };
+  if (daysLeft <= 0) return { level: "danger", text: t("inspectionOverdue", { n: Math.abs(daysLeft) }), daysLeft };
+  if (daysLeft <= 14) return { level: "danger", text: t("nextInspection", { n: daysLeft }), daysLeft };
+  if (daysLeft <= 30) return { level: "warning", text: t("nextInspection", { n: daysLeft }), daysLeft };
+  return { level: "good", text: t("nextInspection", { n: daysLeft }), daysLeft };
 }
 
 function getInspectionAlert(vehicle) {
@@ -1472,10 +1472,10 @@ function getInspectionAlert(vehicle) {
     level: cd.level,
     vehiclePlate: vehicle.plate,
     message: cd.daysLeft == null
-      ? "Nog geen inspectie uitgevoerd"
+      ? t("noInspection")
       : cd.daysLeft <= 0
-        ? `Inspectie ${Math.abs(cd.daysLeft)} dagen te laat`
-        : `Inspectie over ${cd.daysLeft} dagen`,
+        ? t("inspectionOverdue", { n: Math.abs(cd.daysLeft) })
+        : t("inspectionSoon", { n: cd.daysLeft }),
     type: "inspection"
   };
 }

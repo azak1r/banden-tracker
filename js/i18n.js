@@ -55,7 +55,29 @@ const translations = {
     lastInspection: "Laatste inspectie",
     noInspection: "Nog geen inspectie uitgevoerd",
     daysLeft: "Nog {n} dagen",
-    daysOverdue: "{n} dagen te laat"
+    daysOverdue: "{n} dagen te laat",
+    statusGood: "Goed",
+    statusWarning: "Let op",
+    statusDanger: "Actie nodig",
+    statusUnknown: "Onbekend",
+    statusNew: "Nieuw",
+    statusCritical: "Kritiek",
+
+    noDriver: "Geen chauffeur",
+    nextInspection: "Volgende inspectie in {n} dagen",
+    inspectionOverdue: "Inspectie {n} dagen te laat",
+    inspectionSoon: "Inspectie over {n} dagen",
+
+    depthLow: "Profieldiepte te laag ({n} mm) — vervangen geadviseerd",
+    depthWarnRegroove: "Profieldiepte laag ({n} mm) — regrooven mogelijk",
+    depthWarn: "Profieldiepte laag ({n} mm) — binnenkort vervangen",
+    pressureDiff: "Grote drukafwijking ({p} bar, voorschrift {t} bar) — controleer op lekke band",
+
+    tiresCount: "{n} banden",
+    goodCount: "{n} goed",
+    warningCount: "{n} let op",
+    dangerCount: "{n} actie",
+    unknownCount: "{n} onbekend"
   },
   en: {
     subtitle: "Overview of your fleet and tire status",
@@ -112,7 +134,29 @@ const translations = {
     lastInspection: "Last inspection",
     noInspection: "No inspection yet",
     daysLeft: "{n} days left",
-    daysOverdue: "{n} days overdue"
+    daysOverdue: "{n} days overdue",
+    statusGood: "Good",
+    statusWarning: "Warning",
+    statusDanger: "Action needed",
+    statusUnknown: "Unknown",
+    statusNew: "New",
+    statusCritical: "Critical",
+
+    noDriver: "No driver",
+    nextInspection: "Next inspection in {n} days",
+    inspectionOverdue: "Inspection {n} days overdue",
+    inspectionSoon: "Inspection in {n} days",
+
+    depthLow: "Tread depth too low ({n} mm) — replacement advised",
+    depthWarnRegroove: "Tread depth low ({n} mm) — regrooving possible",
+    depthWarn: "Tread depth low ({n} mm) — replace soon",
+    pressureDiff: "Large pressure deviation ({p} bar, target {t} bar) — check for puncture",
+
+    tiresCount: "{n} tires",
+    goodCount: "{n} good",
+    warningCount: "{n} warning",
+    dangerCount: "{n} action",
+    unknownCount: "{n} unknown"
   }
 };
 
@@ -156,6 +200,14 @@ function updateLanguage(lang) {
   });
 
   localStorage.setItem("lang", lang);
+
+  // Refresh dynamic content
+  if (typeof renderVehicles === "function") renderVehicles();
+  if (typeof updateAlertsBadge === "function") updateAlertsBadge();
+  const alertsPage = document.getElementById("page-alerts");
+  if (alertsPage?.classList.contains("active") && typeof renderAlertsPage === "function") {
+    renderAlertsPage();
+  }
 }
 
 const savedLang = localStorage.getItem("lang");
