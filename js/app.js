@@ -1615,13 +1615,16 @@ document.getElementById("form-tire-edit")?.addEventListener("submit", async (e) 
   const size = document.getElementById("edit-tire-size").value.trim();
   const depthVal = document.getElementById("edit-tire-depth").value;
   const pressureVal = document.getElementById("edit-tire-pressure").value;
+  const correctedVal = document.getElementById("edit-tire-corrected")?.value || "";
   const targetVal = document.getElementById("edit-tire-target").value;
   const installedVal = document.getElementById("edit-tire-installed").value;
   const kmVal = document.getElementById("edit-tire-km").value;
   const regrooved = document.getElementById("edit-tire-regrooved").checked;
 
   const currentDepth = depthVal === "" ? null : parseFloat(depthVal);
-  const currentPressure = pressureVal === "" ? null : parseFloat(pressureVal);
+  const measured = pressureVal === "" ? null : parseFloat(pressureVal);
+  const corrected = correctedVal === "" ? null : parseFloat(correctedVal);
+  const currentPressure = corrected != null ? corrected : measured;
   const targetPressure = targetVal === "" ? null : parseFloat(targetVal);
   const mountedKm = kmVal === "" ? null : parseInt(kmVal, 10);
   const installedAt = installedVal
@@ -1658,7 +1661,10 @@ document.getElementById("form-tire-edit")?.addEventListener("submit", async (e) 
       depth: currentDepth,
       pressure: currentPressure,
       type: "inspection",
-      notes: regrooved ? "Geherprofileerd (handmatige edit)" : "Handmatige edit",
+      notes: [
+        corrected != null && measured != null ? `Gemeten ${measured} → gecorrigeerd ${corrected} bar` : "",
+        regrooved ? "Geherprofileerd (handmatige edit)" : "Handmatige edit"
+      ].filter(Boolean).join(" • "),
       regrooved
     });
 
