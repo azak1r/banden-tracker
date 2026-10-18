@@ -729,6 +729,29 @@ async function openInspectionForm(plate, mode = "initial") {
     document.getElementById("inspection-inspector").value = "";
   }
 
+  // Bulk apply controls
+  if (!document.getElementById("bulk-apply-box")) {
+    const bulk = document.createElement("div");
+    bulk.id = "bulk-apply-box";
+    bulk.className = "inspection-tire-card";
+    bulk.style.marginBottom = "16px";
+    bulk.innerHTML = `
+      <h4>Snel invullen</h4>
+      <div class="form-row">
+        <div><label>Merk</label><input type="text" id="bulk-brand" placeholder="Continental"></div>
+        <div><label>Type</label><input type="text" id="bulk-type" placeholder="EQ Max S"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Maat</label><input type="text" id="bulk-size" placeholder="315/70 R22.5"></div>
+        <div><label>Voorschrift (bar)</label><input type="number" id="bulk-target" step="0.1" min="0" max="15" placeholder="8.5"></div>
+      </div>
+      <div id="bulk-buttons" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
+    `;
+    const info = document.getElementById("inspection-vehicle-info");
+    if (info && info.nextSibling) info.parentNode.insertBefore(bulk, info.nextSibling.nextSibling);
+    else document.getElementById("inspection-tires-list").parentNode.insertBefore(bulk, document.getElementById("inspection-tires-list"));
+  }
+
   const container = document.getElementById("inspection-tires-list");
   container.innerHTML = "";
 
@@ -851,6 +874,45 @@ async function openInspectionForm(plate, mode = "initial") {
         showCard(currentIndex);
       }
     };
+  }
+
+  // Build bulk axle buttons
+  const bulkBtns = document.getElementById("bulk-buttons");
+  if (bulkBtns) {
+    bulkBtns.innerHTML = "";
+    const axleNumbers = [...new Set(tires.map(t => t.axleNumber))].sort((a,b)=>a-b);
+    axleNumbers.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-secondary btn-sm";
+      btn.textContent = "As " + num;
+      btn.onclick = () => applyBulk(num);
+      bulkBtns.appendChild(btn);
+    });
+    const allBtn = document.createElement("button");
+    allBtn.type = "button";
+    allBtn.className = "btn-primary btn-sm";
+    allBtn.textContent = "Alle banden";
+    allBtn.onclick = () => applyBulk(null);
+    bulkBtns.appendChild(allBtn);
+  }
+
+  function applyBulk(axleNumber) {
+    const brand = document.getElementById("bulk-brand")?.value || "";
+    const type = document.getElementById("bulk-type")?.value || "";
+    const size = document.getElementById("bulk-size")?.value || "";
+    const target = document.getElementById("bulk-target")?.value || "";
+
+    cards.forEach(card => {
+      const tire = tires.find(t => String(t.id) === String(card.dataset.tireId));
+      if (!tire) return;
+      if (axleNumber != null && tire.axleNumber !== axleNumber) return;
+
+      if (brand) card.querySelector(".tire-brand").value = brand;
+      if (type) card.querySelector(".tire-type").value = type;
+      if (size) card.querySelector(".tire-size").value = size;
+      if (target) card.querySelector(".tire-target").value = target;
+    });
   }
 
   showCard(0);
