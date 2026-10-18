@@ -777,6 +777,66 @@ async function openInspectionForm(plate, mode = "initial") {
     container.appendChild(card);
   });
 
+  // Guided flow: show one tire at a time
+  const cards = container.querySelectorAll(".inspection-tire-card");
+  let currentIndex = 0;
+
+  function showCard(index) {
+    cards.forEach((c, i) => c.style.display = i === index ? "block" : "none");
+    const progress = document.getElementById("inspection-progress");
+    if (progress) progress.textContent = `Band ${index + 1} van ${cards.length}`;
+
+    const prevBtn = document.getElementById("btn-insp-prev");
+    const nextBtn = document.getElementById("btn-insp-next");
+    const saveBtn = document.getElementById("save-initial-inspection");
+
+    if (prevBtn) prevBtn.disabled = index === 0;
+    if (nextBtn) nextBtn.style.display = index === cards.length - 1 ? "none" : "inline-block";
+    if (saveBtn) saveBtn.style.display = index === cards.length - 1 ? "inline-block" : "none";
+  }
+
+  // Add progress + nav if not already present
+  if (!document.getElementById("inspection-progress")) {
+    const progressEl = document.createElement("p");
+    progressEl.id = "inspection-progress";
+    progressEl.className = "header-subtitle";
+    progressEl.style.marginBottom = "12px";
+    container.parentNode.insertBefore(progressEl, container);
+
+    const nav = document.createElement("div");
+    nav.className = "form-actions";
+    nav.style.marginTop = "12px";
+    nav.innerHTML = `
+      <button type="button" id="btn-insp-prev" class="btn-secondary">Vorige</button>
+      <button type="button" id="btn-insp-next" class="btn-primary">Volgende</button>
+    `;
+    container.parentNode.insertBefore(nav, container.nextSibling);
+
+    document.getElementById("btn-insp-prev").onclick = () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        showCard(currentIndex);
+      }
+    };
+    document.getElementById("btn-insp-next").onclick = () => {
+      const card = cards[currentIndex];
+      const inside = card.querySelector("[data-field='depthInside']")?.value;
+      const middle = card.querySelector("[data-field='depthMiddle']")?.value;
+      const outside = card.querySelector("[data-field='depthOutside']")?.value;
+      const pressure = card.querySelector(".tire-pressure")?.value;
+      if (!inside || !middle || !outside || !pressure) {
+        alert("Vul alle drie de dieptemetingen en de druk in voordat je verder gaat.");
+        return;
+      }
+      if (currentIndex < cards.length - 1) {
+        currentIndex++;
+        showCard(currentIndex);
+      }
+    };
+  }
+
+  showCard(0);
+
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById("page-initial-inspection").classList.add("active");
 }
@@ -808,7 +868,7 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
     const inside = card.querySelector("[data-field='depthInside']")?.value;
     const middle = card.querySelector("[data-field='depthMiddle']")?.value;
     const outside = card.querySelector("[data-field='depthOutside']")?.value;
-    const pressure = card.querySelector("[data-field='pressure']")?.value;
+    const pressure = card.querySelector(".tire-pressure")?.value;
     const label = card.querySelector("h4")?.textContent || "Band";
 
     if (!inside || !middle || !outside || !pressure) {
