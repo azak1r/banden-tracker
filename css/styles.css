@@ -1331,3 +1331,8 @@ button:disabled {
   background: var(--bg-body);
   color: var(--text-primary);
 }
+.depth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}

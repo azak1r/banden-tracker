@@ -137,6 +137,10 @@ function mapTire(record) {
     model: record.size || "",
     size: record.size || "",
     currentDepth: record.currentDepth,
+    depthInside: record.depthInside ?? null,
+    depthMiddle: record.depthMiddle ?? null,
+    depthOutside: record.depthOutside ?? null,
+    lowestPosition: record.lowestPosition || null,
     currentPressure: record.currentPressure,
     targetPressure: record.targetPressure,
     status: record.status || "unknown",
@@ -445,8 +449,14 @@ document.getElementById("btn-save-driver")?.addEventListener("click", async () =
           }
         }
 
-        const depth = tire.currentDepth != null
-          ? `<strong class="${depthClass}">${tire.currentDepth} mm</strong>` : "–";
+        const depths = [];
+        if (tire.depthInside != null) depths.push(`Binnen ${tire.depthInside}`);
+        if (tire.depthMiddle != null) depths.push(`Midden ${tire.depthMiddle}`);
+        if (tire.depthOutside != null) depths.push(`Buiten ${tire.depthOutside}`);
+        const depthLine = depths.length
+          ? depths.join(" • ") + (tire.lowestPosition ? ` (laagste: ${tire.lowestPosition})` : "")
+          : (tire.currentDepth != null ? `${tire.currentDepth} mm` : "–");
+        const depth = `<strong class="${depthClass}">${depthLine}</strong>`;
         const pressure = tire.currentPressure != null
           ? `<strong class="${pressureClass}">${tire.currentPressure} bar</strong>` : "–";
         const target = tire.targetPressure != null
@@ -727,8 +737,20 @@ async function openInspectionForm(plate, mode = "initial") {
         </div>
         <div>
           <label>Profieldiepte (mm)</label>
-          <input type="number" class="tire-depth" step="0.1" min="0" max="30"
-                 value="${tire.currentDepth ?? ""}" placeholder="0.0">
+          <div class="form-row depth-row">
+            <div>
+              <label>Binnen</label>
+              <input type="number" step="0.1" min="0" max="30" data-field="depthInside" placeholder="0.0">
+            </div>
+            <div>
+              <label>Midden</label>
+              <input type="number" step="0.1" min="0" max="30" data-field="depthMiddle" placeholder="0.0">
+            </div>
+            <div>
+              <label>Buiten</label>
+              <input type="number" step="0.1" min="0" max="30" data-field="depthOutside" placeholder="0.0">
+            </div>
+          </div>
         </div>
       </div>
       <div class="form-row">
@@ -803,6 +825,25 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
       const regrooved = card.querySelector(".tire-regrooved").checked;
 
       const depth = depthVal === "" ? null : parseFloat(depthVal);
+      const inside = parseFloat(card.querySelector("[data-field='depthInside']").value) || null;
+      const middle = parseFloat(card.querySelector("[data-field='depthMiddle']").value) || null;
+      const outside = parseFloat(card.querySelector("[data-field='depthOutside']").value) || null;
+
+      const values = [
+        { pos: "inside", val: inside },
+        { pos: "middle", val: middle },
+        { pos: "outside", val: outside }
+      ].filter(v => v.val != null);
+
+      let currentDepth = null;
+      let lowestPosition = null;
+
+      if (values.length) {
+        const lowest = values.reduce((a, b) => a.val < b.val ? a : b);
+        currentDepth = lowest.val;
+        lowestPosition = lowest.pos;
+      }
+
       const pressure = pressureVal === "" ? null : parseFloat(pressureVal);
       const targetPressure = targetVal === "" ? null : parseFloat(targetVal);
 
@@ -820,7 +861,11 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
         brand,
         type,
         size,
-        currentDepth: depth,
+        depthInside: inside,
+        depthMiddle: middle,
+        depthOutside: outside,
+        currentDepth,
+        lowestPosition,
         currentPressure: pressure,
         targetPressure,
         regrooved,
@@ -1198,15 +1243,21 @@ async function openTireDetail(tire) {
     depthHint.textContent = "Nog niet gemeten";
   } else {
     depthEl.textContent = `${tire.currentDepth} mm`;
+    const three = [
+      tire.depthInside != null ? `Binnen ${tire.depthInside}` : null,
+      tire.depthMiddle != null ? `Midden ${tire.depthMiddle}` : null,
+      tire.depthOutside != null ? `Buiten ${tire.depthOutside}` : null
+    ].filter(Boolean);
+    const lowest = tire.lowestPosition ? ` (laagste: ${tire.lowestPosition})` : "";
     if (tire.currentDepth <= 2) {
       depthEl.className = "metric-value danger";
-      depthHint.textContent = "Vervangen geadviseerd (≤ 2 mm)";
+      depthHint.textContent = (three.length ? three.join(" • ") + lowest + " — " : "") + "Vervangen geadviseerd (≤ 2 mm)";
     } else if (tire.currentDepth <= 4) {
       depthEl.className = "metric-value warn";
-      depthHint.textContent = "Onder / rond adviesdrempel (4 mm)";
+      depthHint.textContent = (three.length ? three.join(" • ") + lowest + " — " : "") + "Onder / rond adviesdrempel (4 mm)";
     } else {
       depthEl.className = "metric-value good";
-      depthHint.textContent = "Binnen acceptabel bereik";
+      depthHint.textContent = (three.length ? three.join(" • ") + lowest + " — " : "") + "Binnen acceptabel bereik";
     }
   }
 
