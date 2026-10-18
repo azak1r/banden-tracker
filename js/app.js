@@ -810,6 +810,12 @@ async function openInspectionForm(plate, mode = "initial") {
                  value="${tire.currentPressure ?? ""}" placeholder="0.0">
         </div>
         <div>
+          <label>Gecorrigeerd (bar)</label>
+          <input type="number" class="tire-corrected" step="0.1" min="0" max="15" placeholder="0.0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
           <label>Voorschrift druk (bar)</label>
           <input type="number" class="tire-target" step="0.1" min="0" max="15"
                  value="${tire.targetPressure ?? ""}" placeholder="0.0">
@@ -1005,6 +1011,7 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
       const type = card.querySelector(".tire-type")?.value.trim() || "";
       const size = card.querySelector(".tire-size")?.value.trim() || "";
       const pressureVal = card.querySelector(".tire-pressure")?.value || "";
+      const correctedVal = card.querySelector(".tire-corrected")?.value || "";
       const targetVal = card.querySelector(".tire-target")?.value || "";
       const regrooved = !!card.querySelector(".tire-regrooved")?.checked;
       const notes = card.querySelector(".tire-notes")?.value.trim() || "";
@@ -1029,7 +1036,10 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
         lowestPosition = lowest.pos;
       }
 
-      const pressure = pressureVal === "" ? null : parseFloat(pressureVal);
+      const measured = pressureVal === "" ? null : parseFloat(pressureVal);
+      const corrected = correctedVal === "" ? null : parseFloat(correctedVal);
+      // Use corrected pressure if provided, otherwise measured
+      const pressure = corrected != null ? corrected : measured;
       const targetPressure = targetVal === "" ? null : parseFloat(targetVal);
 
       const tire = tires.find(t => String(t.id) === String(tireId));
@@ -1058,7 +1068,11 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
         installedAt: tire.installedAt || new Date().toISOString()
       });
 
-      const historyNotes = [notes, regrooved ? "Geherprofileerd" : ""].filter(Boolean).join(" • ");
+      const historyNotes = [
+        notes,
+        measured != null && corrected != null ? `Gemeten ${measured} → gecorrigeerd ${corrected} bar` : "",
+        regrooved ? "Geherprofileerd" : ""
+      ].filter(Boolean).join(" • ");
       await apiAddHistory({
         tireId: tire.id,
         vehiclePlate: currentInspectionPlate,
