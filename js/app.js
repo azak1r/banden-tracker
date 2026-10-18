@@ -826,6 +826,7 @@ async function openInspectionForm(plate, mode = "initial") {
           <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem;">
             <input type="checkbox" class="tire-regrooved" ${tire.regrooved ? "checked" : ""}>
             Geherprofileerd
+            <span class="regroove-hint" style="display:none;font-size:0.75rem;color:#d97706;margin-left:6px">(vul nieuwe diepte in)</span>
           </label>
         </div>
       </div>
@@ -942,6 +943,22 @@ async function openInspectionForm(plate, mode = "initial") {
     });
   }
 
+  // Show hint when regrooved is checked
+  container.addEventListener("change", (e) => {
+    if (e.target.classList.contains("tire-regrooved")) {
+      const card = e.target.closest(".inspection-tire-card");
+      const hint = e.target.parentElement.querySelector(".regroove-hint");
+      if (hint) hint.style.display = e.target.checked ? "inline" : "none";
+
+      if (e.target.checked && card) {
+        card.querySelectorAll("[data-field='depthInside'], [data-field='depthMiddle'], [data-field='depthOutside']").forEach(input => {
+          input.value = "";
+          input.focus();
+        });
+      }
+    }
+  });
+
   showCard(0);
 
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -978,8 +995,11 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
     const pressure = card.querySelector(".tire-pressure")?.value;
     const label = card.querySelector("h4")?.textContent || "Band";
 
+    const regrooved = card.querySelector(".tire-regrooved")?.checked;
     if (!inside || !middle || !outside || !pressure) {
       missing.push(label);
+    } else if (regrooved && (!inside || !middle || !outside)) {
+      missing.push(label + " (nieuwe diepte na regrooven)");
     }
   });
 
@@ -1556,7 +1576,18 @@ async function openTireDetail(tire) {
   document.getElementById("page-tire-detail").classList.add("active");
 }
 
-document.getElementById("back-from-tire")?.addEventListener("click", () => {
+document.getElementById("back-from-tire")?.addEventListener("click", async () => {
+  const plate = document.getElementById("detail-plate")?.textContent.trim();
+  if (plate) {
+    clearCache();
+    const raw = await apiGetVehicleByPlate(plate);
+    if (raw) {
+      const vehicle = mapVehicle(raw);
+      const tires = await getTiresCached(plate);
+      await openVehicleDetail(vehicle, tires);
+      return;
+    }
+  }
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById("page-vehicle-detail").classList.add("active");
 });
@@ -1670,6 +1701,7 @@ document.getElementById("form-tire-edit")?.addEventListener("submit", async (e) 
 
     const updated = { ...editingTire, ...fields, model: size };
     window._lastOpenedTire = updated;
+    clearCache();
     await openTireDetail(updated);
     alert("Band opgeslagen");
   } catch (err) {
