@@ -120,6 +120,7 @@ function mapVehicle(record) {
     driver: record.driver || "",
     axles: record.axles || [],
     lastInspection: record.lastInspection || null,
+    lastInspector: record.lastInspector || "",
     createdAt: record.createdAt || record.created
   };
 }
@@ -384,7 +385,7 @@ document.getElementById("btn-save-driver")?.addEventListener("click", async () =
 });
 
   let meta = vehicle.lastInspection
-    ? `Laatste inspectie: ${new Date(vehicle.lastInspection).toLocaleDateString("nl-NL")}`
+    ? `Laatste inspectie: ${new Date(vehicle.lastInspection).toLocaleDateString("nl-NL")}${vehicle.lastInspector ? " door " + vehicle.lastInspector : ""}`
     : "Nog geen inspectie uitgevoerd";
 
   if (vehicle.axles?.length) {
@@ -711,6 +712,23 @@ async function openInspectionForm(plate, mode = "initial") {
   document.getElementById("inspection-vehicle-info").textContent =
     `${plate} • ${vehicle.brand || ""} ${vehicle.model || ""}`.trim();
 
+  // Inspector name field
+  if (!document.getElementById("inspection-inspector")) {
+    const inspRow = document.createElement("div");
+    inspRow.className = "form-row";
+    inspRow.style.marginBottom = "16px";
+    inspRow.innerHTML = `
+      <div style="flex:1">
+        <label>Inspecteur</label>
+        <input type="text" id="inspection-inspector" placeholder="Naam inspecteur" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-body);color:var(--text-primary)">
+      </div>
+    `;
+    const info = document.getElementById("inspection-vehicle-info");
+    if (info) info.parentNode.insertBefore(inspRow, info.nextSibling);
+  } else {
+    document.getElementById("inspection-inspector").value = "";
+  }
+
   const container = document.getElementById("inspection-tires-list");
   container.innerHTML = "";
 
@@ -881,6 +899,8 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
     return;
   }
 
+  const inspector = document.getElementById("inspection-inspector")?.value.trim() || "";
+
 
   if (!currentInspectionPlate) {
     alert("Geen voertuig geselecteerd");
@@ -971,7 +991,7 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
     if (raw) {
       await apiUpdateVehicle(raw.id, {
         lastInspection: new Date().toISOString()
-      });
+      , lastInspector: inspector });
     }
 
     await renderVehicles();
