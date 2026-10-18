@@ -918,18 +918,16 @@ document.getElementById("save-initial-inspection")?.addEventListener("click", as
 
     for (const card of cards) {
       const tireId = card.dataset.tireId;
-      const brand = card.querySelector(".tire-brand").value.trim();
+      const brand = card.querySelector(".tire-brand")?.value.trim() || "";
       const type = card.querySelector(".tire-type")?.value.trim() || "";
-      const size = card.querySelector(".tire-size").value.trim();
-      const depthVal = card.querySelector(".tire-depth").value;
-      const pressureVal = card.querySelector(".tire-pressure").value;
-      const targetVal = card.querySelector(".tire-target").value;
-      const regrooved = card.querySelector(".tire-regrooved").checked;
+      const size = card.querySelector(".tire-size")?.value.trim() || "";
+      const pressureVal = card.querySelector(".tire-pressure")?.value || "";
+      const targetVal = card.querySelector(".tire-target")?.value || "";
+      const regrooved = !!card.querySelector(".tire-regrooved")?.checked;
 
-      const depth = depthVal === "" ? null : parseFloat(depthVal);
-      const inside = parseFloat(card.querySelector("[data-field='depthInside']").value) || null;
-      const middle = parseFloat(card.querySelector("[data-field='depthMiddle']").value) || null;
-      const outside = parseFloat(card.querySelector("[data-field='depthOutside']").value) || null;
+      const inside = parseFloat(card.querySelector("[data-field='depthInside']")?.value) || null;
+      const middle = parseFloat(card.querySelector("[data-field='depthMiddle']")?.value) || null;
+      const outside = parseFloat(card.querySelector("[data-field='depthOutside']")?.value) || null;
 
       const values = [
         { pos: "inside", val: inside },
