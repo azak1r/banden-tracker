@@ -256,3 +256,18 @@ async function apiChangePassword(newPassword) {
     mustChangePassword: false
   });
 }
+
+
+async function apiRequestEmailChange(newEmail) {
+  return pb.collection("users").requestEmailChange(newEmail);
+}
+
+async function apiUpdatePassword(oldPassword, newPassword) {
+  const user = getCurrentUser();
+  if (!user) throw new Error("Niet ingelogd");
+  return pb.collection("users").update(user.id, {
+    oldPassword,
+    password: newPassword,
+    passwordConfirm: newPassword
+  });
+}

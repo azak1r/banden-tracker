@@ -1900,3 +1900,72 @@ document.getElementById("change-password-form")?.addEventListener("submit", asyn
     errorEl.style.display = "block";
   }
 });
+
+
+// ===== User settings =====
+document.getElementById("btn-user-settings")?.addEventListener("click", () => {
+  const user = getCurrentUser();
+  document.getElementById("settings-current-email").textContent = user?.email || "";
+  document.getElementById("settings-modal").style.display = "flex";
+  document.getElementById("email-change-result").style.display = "none";
+  document.getElementById("password-change-result").style.display = "none";
+  document.getElementById("change-email-form").reset();
+  document.getElementById("change-password-settings-form").reset();
+});
+
+document.getElementById("settings-close")?.addEventListener("click", () => {
+  document.getElementById("settings-modal").style.display = "none";
+});
+
+document.getElementById("change-email-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const newEmail = document.getElementById("settings-new-email").value.trim();
+  const resultEl = document.getElementById("email-change-result");
+
+  try {
+    await apiRequestEmailChange(newEmail);
+    resultEl.textContent = "Bevestigingsmail verstuurd naar " + newEmail;
+    resultEl.style.color = "#22c55e";
+    resultEl.style.display = "block";
+    document.getElementById("change-email-form").reset();
+  } catch (err) {
+    console.error(err);
+    resultEl.textContent = "Mislukt: " + (err.message || "onbekende fout");
+    resultEl.style.color = "#ef4444";
+    resultEl.style.display = "block";
+  }
+});
+
+document.getElementById("change-password-settings-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const oldPw = document.getElementById("settings-old-password").value;
+  const newPw = document.getElementById("settings-new-password").value;
+  const confirm = document.getElementById("settings-confirm-password").value;
+  const resultEl = document.getElementById("password-change-result");
+
+  if (newPw !== confirm) {
+    resultEl.textContent = "Nieuwe wachtwoorden komen niet overeen.";
+    resultEl.style.color = "#ef4444";
+    resultEl.style.display = "block";
+    return;
+  }
+  if (newPw.length < 8) {
+    resultEl.textContent = "Wachtwoord moet minimaal 8 tekens zijn.";
+    resultEl.style.color = "#ef4444";
+    resultEl.style.display = "block";
+    return;
+  }
+
+  try {
+    await apiUpdatePassword(oldPw, newPw);
+    resultEl.textContent = "Wachtwoord gewijzigd.";
+    resultEl.style.color = "#22c55e";
+    resultEl.style.display = "block";
+    document.getElementById("change-password-settings-form").reset();
+  } catch (err) {
+    console.error(err);
+    resultEl.textContent = "Mislukt: " + (err.message || "controleer het huidige wachtwoord");
+    resultEl.style.color = "#ef4444";
+    resultEl.style.display = "block";
+  }
+});

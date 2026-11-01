@@ -21,6 +21,7 @@
     <div class="header-top">
       <h1 class="app-title">Banden Tracker</h1>
       <div class="header-actions">
+        <button id="btn-user-settings" class="btn-secondary btn-sm" title="Instellingen">⚙️</button>
         <button id="btn-invite-user" class="btn-secondary btn-sm" style="display:none" title="Gebruiker uitnodigen">+ Gebruiker</button>
         <button id="theme-toggle" class="theme-btn" title="Thema wisselen">🌙</button>
         <div class="lang-switch">
@@ -365,7 +366,6 @@
         <select id="invite-role" required>
           <option value="mechanic">Monteur</option>
           <option value="manager">Manager</option>
-          <option value="chauffeur">Chauffeur</option>
           <option value="admin">Admin</option>
         </select>
         <label>Tijdelijk wachtwoord</label>
@@ -378,6 +378,37 @@
   </div>
 
   
+  
+  <!-- User settings modal -->
+  <div id="settings-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Account instellingen</h2>
+      <p class="header-subtitle" id="settings-current-email"></p>
+
+      <form id="change-email-form" style="margin-top:16px">
+        <label>Nieuw e-mailadres</label>
+        <input type="email" id="settings-new-email" required placeholder="nieuw@bedrijf.nl">
+        <button type="submit" class="btn-primary" style="margin-top:8px">E-mail wijzigen</button>
+        <p id="email-change-result" style="display:none;margin-top:8px;font-size:0.85rem"></p>
+      </form>
+
+      <hr class="form-divider">
+
+      <form id="change-password-settings-form">
+        <label>Huidig wachtwoord</label>
+        <input type="password" id="settings-old-password" required>
+        <label>Nieuw wachtwoord</label>
+        <input type="password" id="settings-new-password" required minlength="8">
+        <label>Bevestig nieuw wachtwoord</label>
+        <input type="password" id="settings-confirm-password" required minlength="8">
+        <button type="submit" class="btn-primary" style="margin-top:8px">Wachtwoord wijzigen</button>
+        <p id="password-change-result" style="display:none;margin-top:8px;font-size:0.85rem"></p>
+      </form>
+
+      <button type="button" id="settings-close" class="btn-secondary" style="margin-top:16px;width:100%">Sluiten</button>
+    </div>
+  </div>
+
   <!-- Force password change modal -->
   <div id="change-password-modal" class="modal" style="display:none;">
     <div class="modal-content">
