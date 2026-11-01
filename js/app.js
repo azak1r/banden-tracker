@@ -1969,3 +1969,14 @@ document.getElementById("change-password-settings-form")?.addEventListener("subm
     resultEl.style.display = "block";
   }
 });
+
+
+// ===== Logout =====
+document.getElementById("btn-logout")?.addEventListener("click", () => {
+  logout();
+  document.getElementById("settings-modal").style.display = "none";
+  showLogin();
+  // Clear any open pages
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-dashboard")?.classList.add("active");
+});
