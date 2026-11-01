@@ -21,6 +21,7 @@
     <div class="header-top">
       <h1 class="app-title">Banden Tracker</h1>
       <div class="header-actions">
+        <button id="btn-invite-user" class="btn-secondary btn-sm" style="display:none" title="Gebruiker uitnodigen">+ Gebruiker</button>
         <button id="theme-toggle" class="theme-btn" title="Thema wisselen">🌙</button>
         <div class="lang-switch">
           <button class="lang-btn active" data-lang="nl">NL</button>
@@ -326,7 +327,6 @@
       <li>Gebruikers uitnodigen vanuit de app</li>
       <li>Capacitor (Play Store / App Store)</li>
       <li>Bandengeschiedenis grafiek</li>
-      <li>Dieptevelden leegmaken bij aanvinken Geherprofileerd</li>
     </ul>
   </div>
 </section>
@@ -352,6 +352,29 @@
   <span class="nav-label">Te doen</span>
 </button>
   </nav>
+
+  
+  <!-- Invite user modal -->
+  <div id="invite-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Gebruiker uitnodigen</h2>
+      <form id="invite-form">
+        <label>E-mail</label>
+        <input type="email" id="invite-email" required placeholder="naam@bedrijf.nl">
+        <label>Rol</label>
+        <select id="invite-role" required>
+          <option value="mechanic">Monteur</option>
+          <option value="manager">Manager</option>
+          <option value="admin">Admin</option>
+        </select>
+        <label>Tijdelijk wachtwoord</label>
+        <input type="text" id="invite-password" required placeholder="Minimaal 8 tekens" minlength="8">
+        <button type="submit" class="btn-primary">Uitnodigen</button>
+        <button type="button" id="invite-cancel" class="btn-secondary" style="margin-top:8px">Annuleren</button>
+        <p id="invite-result" style="display:none;margin-top:12px;font-size:0.9rem"></p>
+      </form>
+    </div>
+  </div>
 
   <!-- Login modal -->
 <div id="login-modal" class="modal" style="display:none;">

@@ -221,3 +221,18 @@ async function apiDeleteHistoryForVehicle(plate) {
   }
 }
 
+
+
+// ----- Users / Invite -----
+async function apiInviteUser(email, password, role = "mechanic") {
+  return pbRequest("collections/users/records", {
+    method: "POST",
+    body: JSON.stringify({
+      email,
+      password,
+      passwordConfirm: password,
+      role,
+      emailVisibility: true
+    })
+  });
+}

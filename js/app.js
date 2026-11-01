@@ -1720,6 +1720,12 @@ function applyRoleUI() {
   if (deleteBtn) {
     deleteBtn.style.display = isAdmin ? "" : "none";
   }
+
+  // Show invite button for admins
+  const inviteBtn = document.getElementById("btn-invite-user");
+  if (inviteBtn) {
+    inviteBtn.style.display = isAdmin ? "" : "none";
+  }
 }
 
 function showLogin() {
@@ -1810,3 +1816,42 @@ async function showAppVersion() {
 }
 
 showAppVersion();
+
+// ===== User invite (admin) =====
+document.getElementById("btn-invite-user")?.addEventListener("click", () => {
+  document.getElementById("invite-modal").style.display = "flex";
+  document.getElementById("invite-result").style.display = "none";
+  document.getElementById("invite-form").reset();
+});
+
+document.getElementById("invite-cancel")?.addEventListener("click", () => {
+  document.getElementById("invite-modal").style.display = "none";
+});
+
+document.getElementById("invite-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("invite-email").value.trim();
+  const role = document.getElementById("invite-role").value;
+  const password = document.getElementById("invite-password").value;
+  const resultEl = document.getElementById("invite-result");
+
+  if (password.length < 8) {
+    resultEl.textContent = "Wachtwoord moet minimaal 8 tekens zijn.";
+    resultEl.style.color = "#ef4444";
+    resultEl.style.display = "block";
+    return;
+  }
+
+  try {
+    await apiInviteUser(email, password, role);
+    resultEl.innerHTML = `Gebruiker aangemaakt.<br><strong>E-mail:</strong> ${email}<br><strong>Wachtwoord:</strong> ${password}<br><small>Deel deze gegevens met de gebruiker.</small>`;
+    resultEl.style.color = "#22c55e";
+    resultEl.style.display = "block";
+    document.getElementById("invite-form").reset();
+  } catch (err) {
+    console.error(err);
+    resultEl.textContent = "Uitnodigen mislukt: " + (err.message || "onbekende fout");
+    resultEl.style.color = "#ef4444";
+    resultEl.style.display = "block";
+  }
+});
