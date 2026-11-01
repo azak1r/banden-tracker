@@ -1980,3 +1980,81 @@ document.getElementById("btn-logout")?.addEventListener("click", () => {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById("page-dashboard")?.classList.add("active");
 });
+
+
+// ===== In-app auth confirmations =====
+(function handleAuthConfirm() {
+  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash;
+
+  // Password reset: ?token=... or #/auth/confirm-password-reset/TOKEN
+  let token = params.get("token");
+  let type = params.get("type");
+
+  if (!token && hash.includes("confirm-password-reset")) {
+    token = hash.split("/").pop();
+    type = "password";
+  }
+  if (!token && hash.includes("confirm-email-change")) {
+    token = hash.split("/").pop();
+    type = "email";
+  }
+  if (!token && hash.includes("confirm-verification")) {
+    token = hash.split("/").pop();
+    type = "verify";
+  }
+
+  if (!token) return;
+
+  const modal = document.getElementById("confirm-modal");
+  const title = document.getElementById("confirm-title");
+  const msg = document.getElementById("confirm-message");
+  const pwFields = document.getElementById("confirm-password-fields");
+  const errorEl = document.getElementById("confirm-error");
+  const form = document.getElementById("confirm-form");
+
+  if (type === "password") {
+    title.textContent = "Nieuw wachtwoord instellen";
+    msg.textContent = "Kies een nieuw wachtwoord voor je account.";
+    pwFields.hidden = false;
+  } else if (type === "email") {
+    title.textContent = "E-mailadres bevestigen";
+    msg.textContent = "Klik op de knop om je nieuwe e-mailadres te bevestigen.";
+    pwFields.hidden = true;
+  } else {
+    title.textContent = "E-mail bevestigen";
+    msg.textContent = "Klik op de knop om je e-mailadres te bevestigen.";
+    pwFields.hidden = true;
+  }
+
+  modal.style.display = "flex";
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    errorEl.style.display = "none";
+
+    try {
+      if (type === "password") {
+        const pw = document.getElementById("confirm-new-password").value;
+        const pw2 = document.getElementById("confirm-new-password-2").value;
+        if (pw !== pw2) throw new Error("Wachtwoorden komen niet overeen");
+        if (pw.length < 8) throw new Error("Minimaal 8 tekens");
+        await pb.collection("users").confirmPasswordReset(token, pw, pw2);
+      } else if (type === "email") {
+        await pb.collection("users").confirmEmailChange(token, "");
+      } else {
+        await pb.collection("users").confirmVerification(token);
+      }
+
+      modal.style.display = "none";
+      // Clean the URL
+      history.replaceState(null, "", window.location.pathname);
+      alert("Bevestigd. Je kunt nu inloggen.");
+      showLogin();
+    } catch (err) {
+      console.error(err);
+      errorEl.textContent = err.message || "Bevestigen mislukt";
+      errorEl.style.display = "block";
+    }
+  };
+})();

@@ -410,6 +410,25 @@
     </div>
   </div>
 
+  
+  <!-- In-app confirmation modal -->
+  <div id="confirm-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2 id="confirm-title">Bevestigen</h2>
+      <p id="confirm-message" class="header-subtitle"></p>
+      <form id="confirm-form">
+        <div id="confirm-password-fields" hidden>
+          <label>Nieuw wachtwoord</label>
+          <input type="password" id="confirm-new-password" minlength="8">
+          <label>Bevestig wachtwoord</label>
+          <input type="password" id="confirm-new-password-2" minlength="8">
+        </div>
+        <button type="submit" class="btn-primary" id="confirm-submit">Bevestigen</button>
+        <p id="confirm-error" class="error" style="display:none;"></p>
+      </form>
+    </div>
+  </div>
+
   <!-- Force password change modal -->
   <div id="change-password-modal" class="modal" style="display:none;">
     <div class="modal-content">
