@@ -36,6 +36,12 @@ async function initApp() {
     return;
   }
 
+  const user = getCurrentUser();
+  if (user?.mustChangePassword) {
+    document.getElementById("change-password-modal").style.display = "flex";
+    return;
+  }
+
   applyRoleUI();
 
   try {
@@ -1746,6 +1752,13 @@ document.getElementById("login-form")?.addEventListener("submit", async (e) => {
     await login(email, password);
     errorEl.style.display = "none";
     hideLogin();
+
+    const user = getCurrentUser();
+    if (user?.mustChangePassword) {
+      document.getElementById("change-password-modal").style.display = "flex";
+      return; // block the rest of the app until password is changed
+    }
+
     applyRoleUI();
     await renderVehicles();
     await updateAlertsBadge();
@@ -1853,5 +1866,37 @@ document.getElementById("invite-form")?.addEventListener("submit", async (e) => 
     resultEl.textContent = "Uitnodigen mislukt: " + (err.message || "onbekende fout");
     resultEl.style.color = "#ef4444";
     resultEl.style.display = "block";
+  }
+});
+
+
+// ===== Force password change =====
+document.getElementById("change-password-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const pw = document.getElementById("new-password").value;
+  const confirm = document.getElementById("new-password-confirm").value;
+  const errorEl = document.getElementById("change-password-error");
+
+  if (pw !== confirm) {
+    errorEl.textContent = "Wachtwoorden komen niet overeen.";
+    errorEl.style.display = "block";
+    return;
+  }
+  if (pw.length < 8) {
+    errorEl.textContent = "Wachtwoord moet minimaal 8 tekens zijn.";
+    errorEl.style.display = "block";
+    return;
+  }
+
+  try {
+    await apiChangePassword(pw);
+    document.getElementById("change-password-modal").style.display = "none";
+    applyRoleUI();
+    await renderVehicles();
+    await updateAlertsBadge();
+  } catch (err) {
+    console.error(err);
+    errorEl.textContent = "Wijzigen mislukt: " + (err.message || "onbekende fout");
+    errorEl.style.display = "block";
   }
 });

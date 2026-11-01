@@ -376,6 +376,23 @@
     </div>
   </div>
 
+  
+  <!-- Force password change modal -->
+  <div id="change-password-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Wachtwoord wijzigen</h2>
+      <p class="header-subtitle">Je moet je wachtwoord wijzigen bij de eerste keer inloggen.</p>
+      <form id="change-password-form">
+        <label>Nieuw wachtwoord</label>
+        <input type="password" id="new-password" required minlength="8" placeholder="Minimaal 8 tekens">
+        <label>Bevestig wachtwoord</label>
+        <input type="password" id="new-password-confirm" required minlength="8">
+        <button type="submit" class="btn-primary">Wachtwoord opslaan</button>
+        <p id="change-password-error" class="error" style="display:none;"></p>
+      </form>
+    </div>
+  </div>
+
   <!-- Login modal -->
 <div id="login-modal" class="modal" style="display:none;">
   <div class="modal-content">

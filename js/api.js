@@ -225,14 +225,34 @@ async function apiDeleteHistoryForVehicle(plate) {
 
 // ----- Users / Invite -----
 async function apiInviteUser(email, password, role = "mechanic") {
-  return pbRequest("collections/users/records", {
+  const user = await pbRequest("collections/users/records", {
     method: "POST",
     body: JSON.stringify({
       email,
       password,
       passwordConfirm: password,
       role,
+      mustChangePassword: true,
       emailVisibility: true
     })
+  });
+
+  // Send password reset email so the user can set their own password
+  try {
+    await pb.collection("users").requestPasswordReset(email);
+  } catch (e) {
+    console.warn("Password reset email failed", e);
+  }
+
+  return user;
+}
+
+async function apiChangePassword(newPassword) {
+  const user = getCurrentUser();
+  if (!user) throw new Error("Niet ingelogd");
+  return pb.collection("users").update(user.id, {
+    password: newPassword,
+    passwordConfirm: newPassword,
+    mustChangePassword: false
   });
 }
