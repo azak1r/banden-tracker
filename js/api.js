@@ -271,3 +271,16 @@ async function apiUpdatePassword(oldPassword, newPassword) {
     passwordConfirm: newPassword
   });
 }
+
+
+async function apiUpdateProfile(fields) {
+  const user = getCurrentUser();
+  if (!user) throw new Error("Niet ingelogd");
+  return pb.collection("users").update(user.id, fields);
+}
+
+async function apiRefreshUser() {
+  if (!pb.authStore.isValid) return null;
+  await pb.collection("users").authRefresh();
+  return pb.authStore.model;
+}

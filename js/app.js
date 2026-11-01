@@ -1903,12 +1903,39 @@ document.getElementById("change-password-form")?.addEventListener("submit", asyn
 
 
 // ===== User settings =====
-document.getElementById("btn-user-settings")?.addEventListener("click", () => {
-  const user = getCurrentUser();
+document.getElementById("btn-user-settings")?.addEventListener("click", async () => {
+  // Force a full auth refresh so email/name/avatar are current
+  let user = getCurrentUser();
+  try {
+    const refreshed = await pb.collection("users").authRefresh();
+    user = refreshed.record || refreshed;
+    console.log("Refreshed user:", user);
+  } catch (e) {
+    console.warn("authRefresh failed", e);
+    // Fallback: re-fetch the user record
+    try {
+      user = await pb.collection("users").getOne(user.id);
+    } catch (e2) {
+      console.warn("getOne also failed", e2);
+    }
+  }
+
   document.getElementById("settings-current-email").textContent = user?.email || "";
+  document.getElementById("settings-current-name").textContent = user?.name || "Geen naam";
+  document.getElementById("settings-name").value = user?.name || "";
+
+  const avatarEl = document.getElementById("settings-avatar-preview");
+  if (user?.avatar) {
+    avatarEl.src = pb.files.getUrl(user, user.avatar, { thumb: "100x100" });
+    avatarEl.style.display = "block";
+  } else {
+    avatarEl.style.display = "none";
+  }
+
   document.getElementById("settings-modal").style.display = "flex";
   document.getElementById("email-change-result").style.display = "none";
   document.getElementById("password-change-result").style.display = "none";
+  document.getElementById("profile-change-result").style.display = "none";
   document.getElementById("change-email-form").reset();
   document.getElementById("change-password-settings-form").reset();
 });
@@ -2019,8 +2046,9 @@ document.getElementById("btn-logout")?.addEventListener("click", () => {
     pwFields.hidden = false;
   } else if (type === "email") {
     title.textContent = "E-mailadres bevestigen";
-    msg.textContent = "Klik op de knop om je nieuwe e-mailadres te bevestigen.";
+    msg.textContent = "Voer je huidige wachtwoord in om het nieuwe e-mailadres te bevestigen.";
     pwFields.hidden = true;
+    document.getElementById("confirm-current-password-field").hidden = false;
   } else {
     title.textContent = "E-mail bevestigen";
     msg.textContent = "Klik op de knop om je e-mailadres te bevestigen.";
@@ -2041,7 +2069,9 @@ document.getElementById("btn-logout")?.addEventListener("click", () => {
         if (pw.length < 8) throw new Error("Minimaal 8 tekens");
         await pb.collection("users").confirmPasswordReset(token, pw, pw2);
       } else if (type === "email") {
-        await pb.collection("users").confirmEmailChange(token, "");
+        const currentPw = document.getElementById("confirm-current-password").value;
+        if (!currentPw) throw new Error("Huidig wachtwoord is verplicht");
+        await pb.collection("users").confirmEmailChange(token, currentPw);
       } else {
         await pb.collection("users").confirmVerification(token);
       }
@@ -2058,3 +2088,37 @@ document.getElementById("btn-logout")?.addEventListener("click", () => {
     }
   };
 })();
+
+
+document.getElementById("change-profile-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("settings-name").value.trim();
+  const avatarFile = document.getElementById("settings-avatar").files?.[0];
+  const resultEl = document.getElementById("profile-change-result");
+
+  const formData = new FormData();
+  if (name) formData.append("name", name);
+  if (avatarFile) formData.append("avatar", avatarFile);
+
+  try {
+    await apiUpdateProfile(formData);
+    await apiRefreshUser();
+    resultEl.textContent = "Profiel opgeslagen.";
+    resultEl.style.color = "#22c55e";
+    resultEl.style.display = "block";
+
+    // Refresh the preview
+    const user = getCurrentUser();
+    document.getElementById("settings-current-name").textContent = user?.name || "Geen naam";
+    const avatarEl = document.getElementById("settings-avatar-preview");
+    if (user?.avatar) {
+      avatarEl.src = pb.files.getUrl(user, user.avatar, { thumb: "100x100" });
+      avatarEl.style.display = "block";
+    }
+  } catch (err) {
+    console.error(err);
+    resultEl.textContent = "Opslaan mislukt: " + (err.message || "onbekende fout");
+    resultEl.style.color = "#ef4444";
+    resultEl.style.display = "block";
+  }
+});

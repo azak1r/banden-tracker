@@ -383,7 +383,24 @@
   <div id="settings-modal" class="modal" style="display:none;">
     <div class="modal-content">
       <h2>Account instellingen</h2>
-      <p class="header-subtitle" id="settings-current-email"></p>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <img id="settings-avatar-preview" src="" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:#334155;display:none">
+        <div>
+          <div id="settings-current-name" style="font-weight:600"></div>
+          <div class="header-subtitle" id="settings-current-email"></div>
+        </div>
+      </div>
+
+      <form id="change-profile-form">
+        <label>Naam</label>
+        <input type="text" id="settings-name" placeholder="Je naam">
+        <label>Avatar</label>
+        <input type="file" id="settings-avatar" accept="image/*">
+        <button type="submit" class="btn-primary" style="margin-top:8px">Profiel opslaan</button>
+        <p id="profile-change-result" style="display:none;margin-top:8px;font-size:0.85rem"></p>
+      </form>
+
+      <hr class="form-divider">
 
       <form id="change-email-form" style="margin-top:16px">
         <label>Nieuw e-mailadres</label>
@@ -422,6 +439,10 @@
           <input type="password" id="confirm-new-password" minlength="8">
           <label>Bevestig wachtwoord</label>
           <input type="password" id="confirm-new-password-2" minlength="8">
+        </div>
+        <div id="confirm-current-password-field" hidden>
+          <label>Huidig wachtwoord</label>
+          <input type="password" id="confirm-current-password">
         </div>
         <button type="submit" class="btn-primary" id="confirm-submit">Bevestigen</button>
         <p id="confirm-error" class="error" style="display:none;"></p>
