@@ -2022,8 +2022,8 @@ document.getElementById("btn-logout")?.addEventListener("click", () => {
     token = hash.split("/").pop();
     type = "password";
   }
-  if (!token && hash.includes("confirm-email-change")) {
-    token = hash.split("/").pop();
+  if (!token && (hash.includes("confirm-email-change") || params.get("type") === "email")) {
+    token = token || hash.split("/").pop() || params.get("token");
     type = "email";
   }
   if (!token && hash.includes("confirm-verification")) {
@@ -2048,7 +2048,11 @@ document.getElementById("btn-logout")?.addEventListener("click", () => {
     title.textContent = "E-mailadres bevestigen";
     msg.textContent = "Voer je huidige wachtwoord in om het nieuwe e-mailadres te bevestigen.";
     pwFields.hidden = true;
-    document.getElementById("confirm-current-password-field").hidden = false;
+    const curPwField = document.getElementById("confirm-current-password-field");
+    if (curPwField) {
+      curPwField.hidden = false;
+      curPwField.style.display = "block";
+    }
   } else {
     title.textContent = "E-mail bevestigen";
     msg.textContent = "Klik op de knop om je e-mailadres te bevestigen.";
