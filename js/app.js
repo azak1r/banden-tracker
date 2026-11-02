@@ -187,12 +187,15 @@ function getTireDisplayStatus(tire, vehicle) {
     const absDiff = Math.abs(diff);
     const percentLow = (tire.targetPressure - tire.currentPressure) / tire.targetPressure;
 
-    if (absDiff >= 2.0 || percentLow >= 0.20) {
+    // Don't downgrade a critical depth status
+    if (level === "critical") {
+      // keep critical
+    } else if (absDiff >= 2.0 || percentLow >= 0.20) {
       level = "danger";
-    } else if (diff <= -0.1) {
-      level = "warning"; // too low
-    } else if (diff >= 1.0) {
-      level = "warning"; // too high
+    } else if (level !== "danger") {
+      if (diff <= -0.1 || diff >= 1.0) {
+        level = "warning";
+      }
     }
   }
 
