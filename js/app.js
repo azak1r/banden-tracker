@@ -293,14 +293,48 @@ async function renderVehicles() {
   if (vehicles.length === 0) {
     container.innerHTML += `<p class="placeholder">${t("noVehicles")}</p>`;
   } else {
-    // Load all tires in parallel
     const tireLists = await Promise.all(
       vehicles.map(v => getTiresCached(v.plate))
     );
 
+    const groups = {
+      trekker: { label: "Vrachtwagens", items: [] },
+      oplegger: { label: "Opleggers", items: [] },
+      aanhangwagen: { label: "Aanhangwagens", items: [] }
+    };
+
     vehicles.forEach((vehicle, i) => {
-      container.appendChild(buildVehicleCard(vehicle, tireLists[i]));
+      const key = groups[vehicle.type] ? vehicle.type : "aanhangwagen";
+      groups[key].items.push({ vehicle, tires: tireLists[i] });
     });
+
+    for (const [key, group] of Object.entries(groups)) {
+      if (!group.items.length) continue;
+
+      const section = document.createElement("div");
+      section.className = "vehicle-group";
+      section.innerHTML = `
+        <button type="button" class="vehicle-group-header">
+          <span>${group.label} (${group.items.length})</span>
+          <span class="chevron">▾</span>
+        </button>
+        <div class="vehicle-group-body"></div>
+      `;
+
+      const body = section.querySelector(".vehicle-group-body");
+      group.items.forEach(({ vehicle, tires }) => {
+        body.appendChild(buildVehicleCard(vehicle, tires));
+      });
+
+      section.querySelector(".vehicle-group-header").addEventListener("click", () => {
+        const isOpen = body.style.display !== "none";
+        body.style.display = isOpen ? "none" : "";
+        section.querySelector(".chevron").textContent = isOpen ? "▸" : "▾";
+      });
+
+      container.appendChild(section);
+    }
+
     attachVehicleClickEvents();
   }
 
