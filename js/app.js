@@ -469,8 +469,9 @@ document.getElementById("btn-save-driver")?.addEventListener("click", async () =
         if (tire.depthInside != null) depths.push(`Binnen ${tire.depthInside}`);
         if (tire.depthMiddle != null) depths.push(`Midden ${tire.depthMiddle}`);
         if (tire.depthOutside != null) depths.push(`Buiten ${tire.depthOutside}`);
+        const posLabel = { inside: "binnen", middle: "midden", outside: "buiten" };
         const depthLine = depths.length
-          ? depths.join(" • ") + (tire.lowestPosition ? ` (laagste: ${tire.lowestPosition})` : "")
+          ? depths.join(" • ") + (tire.lowestPosition ? ` (laagste: ${posLabel[tire.lowestPosition] || tire.lowestPosition})` : "")
           : (tire.currentDepth != null ? `${tire.currentDepth} mm` : "–");
         const depth = `<strong class="${depthClass}">${depthLine}</strong>`;
         const pressure = tire.currentPressure != null
@@ -1501,7 +1502,8 @@ async function openTireDetail(tire) {
       tire.depthMiddle != null ? `Midden ${tire.depthMiddle}` : null,
       tire.depthOutside != null ? `Buiten ${tire.depthOutside}` : null
     ].filter(Boolean);
-    const lowest = tire.lowestPosition ? ` (laagste: ${tire.lowestPosition})` : "";
+    const posLabel = { inside: "binnen", middle: "midden", outside: "buiten" };
+    const lowest = tire.lowestPosition ? ` (laagste: ${posLabel[tire.lowestPosition] || tire.lowestPosition})` : "";
     if (tire.currentDepth <= 2) {
       depthEl.className = "metric-value danger";
       depthHint.textContent = (three.length ? three.join(" • ") + lowest + " — " : "") + "Vervangen geadviseerd (≤ 2 mm)";
