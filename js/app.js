@@ -260,7 +260,11 @@ function buildVehicleCard(vehicle, tires) {
   card.dataset.id = vehicle.plate;
   card.innerHTML = `
     <div class="vehicle-left">
-      <div class="vehicle-icon">${vehicle.type === "trekker" ? "🚛" : "🚚"}</div>
+      <div class="vehicle-icon">${
+        vehicle.type === "trekker" ? `<svg viewBox="0 0 48 48" width="28" height="28"><rect x="4" y="16" width="28" height="14" rx="2" fill="currentColor"/><rect x="32" y="20" width="12" height="10" rx="1" fill="currentColor" opacity="0.7"/><circle cx="12" cy="34" r="4" fill="currentColor"/><circle cx="28" cy="34" r="4" fill="currentColor"/><circle cx="40" cy="34" r="3" fill="currentColor" opacity="0.7"/></svg>` :
+        vehicle.type === "oplegger" ? `<svg viewBox="0 0 48 48" width="28" height="28"><rect x="6" y="14" width="36" height="12" rx="1" fill="currentColor"/><rect x="4" y="26" width="8" height="4" fill="currentColor" opacity="0.6"/><circle cx="16" cy="34" r="4" fill="currentColor"/><circle cx="32" cy="34" r="4" fill="currentColor"/></svg>` :
+        `<svg viewBox="0 0 48 48" width="28" height="28"><rect x="8" y="16" width="32" height="12" rx="1" fill="currentColor"/><circle cx="16" cy="34" r="4" fill="currentColor"/><circle cx="32" cy="34" r="4" fill="currentColor"/></svg>`
+      }</div>
       <div>
         <div class="vehicle-plate">
           ${vehicle.plate}
@@ -775,6 +779,16 @@ async function openInspectionForm(plate, mode = "initial") {
 
   const container = document.getElementById("inspection-tires-list");
   container.innerHTML = "";
+
+  // Sort: left side first (low axle to high), then right side
+  tires.sort((a, b) => {
+    if (a.side !== b.side) return a.side === "left" ? -1 : 1;
+    if (a.axleNumber !== b.axleNumber) return a.axleNumber - b.axleNumber;
+    // outer before inner on duals
+    if (a.dualPosition === "outer") return -1;
+    if (b.dualPosition === "outer") return 1;
+    return 0;
+  });
 
   tires.forEach(tire => {
     const card = document.createElement("div");
