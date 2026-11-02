@@ -40,7 +40,12 @@ async function pbRequest(path, options = {}) {
 
   const res = await fetch(url, { ...options, headers });
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  // DELETE returns 204 No Content — don't try to parse JSON
+  if (res.status === 204 || res.headers.get("content-length") === "0") {
+    return null;
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 // ----- Vehicles -----
@@ -276,6 +281,7 @@ async function apiUpdatePassword(oldPassword, newPassword) {
 async function apiUpdateProfile(fields) {
   const user = getCurrentUser();
   if (!user) throw new Error("Niet ingelogd");
+  // fields can be a plain object or FormData
   return pb.collection("users").update(user.id, fields);
 }
 
