@@ -1307,3 +1307,37 @@ button:disabled {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
+
+
+/* Collapsible vehicle groups */
+.vehicle-group {
+  margin-bottom: 16px;
+}
+
+.vehicle-group-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.vehicle-group-header:hover {
+  opacity: 0.8;
+}
+
+.vehicle-group-header .chevron {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.vehicle-group-body {
+  /* cards inside */
+}
