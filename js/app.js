@@ -173,7 +173,8 @@ function getTireDisplayStatus(tire, vehicle) {
   let level = "unknown";
 
   if (tire.currentDepth != null && tire.currentDepth > 0) {
-    if (tire.currentDepth <= 2) level = "danger";
+    if (tire.currentDepth <= 1.6) level = "critical";
+    else if (tire.currentDepth <= 2) level = "danger";
     else if (tire.currentDepth <= 4) level = "warning";
     else level = "good";
   }
@@ -201,6 +202,7 @@ function getTireDisplayStatus(tire, vehicle) {
   }
 
   const text =
+    level === "critical" ? "Kritiek" :
     level === "danger" ? t("statusDanger") :
     level === "warning" ? t("statusWarning") :
     level === "good" ? t("statusGood") : t("statusUnknown");
@@ -220,7 +222,7 @@ function getVehicleStatus(tires, vehicle) {
     const display = getTireDisplayStatus(tire, vehicle);
     if (display.level === "unknown") continue;
     hasData = true;
-    if (display.level === "danger") hasDanger = true;
+    if (display.level === "danger" || display.level === "critical") hasDanger = true;
     if (display.level === "warning") hasWarning = true;
   }
 
@@ -1302,7 +1304,13 @@ function getTireFaults(tire) {
   const faults = [];
 
   if (tire.currentDepth != null) {
-    if (tire.currentDepth <= 2) {
+    if (tire.currentDepth <= 1.6) {
+      faults.push({
+        level: "danger",
+        type: "tread",
+        message: `Profieldiepte kritiek (${tire.currentDepth} mm) — direct vervangen`
+      });
+    } else if (tire.currentDepth <= 2) {
       faults.push({
         level: "danger",
         type: "tread",
