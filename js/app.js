@@ -2249,3 +2249,86 @@ document.querySelectorAll(".nav-item").forEach((item, index) => {
     if (index === 3) await renderStock();
   });
 });
+
+
+// ===== Stock forms =====
+document.getElementById("btn-add-stock-tire")?.addEventListener("click", () => {
+  document.getElementById("form-add-stock-tire").style.display = "block";
+  document.getElementById("form-add-stock-rim").style.display = "none";
+});
+
+document.getElementById("cancel-stock-tire")?.addEventListener("click", () => {
+  document.getElementById("form-add-stock-tire").style.display = "none";
+});
+
+document.getElementById("form-add-stock-tire")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const axleSelect = document.getElementById("stock-tire-axle");
+  const axleTypes = [...axleSelect.selectedOptions].map(o => o.value);
+
+  const item = {
+    brand: document.getElementById("stock-tire-brand").value.trim(),
+    type: document.getElementById("stock-tire-type").value.trim(),
+    size: document.getElementById("stock-tire-size").value.trim(),
+    axleTypes,
+    dotCode: document.getElementById("stock-tire-dot").value.trim(),
+    comment: document.getElementById("stock-tire-comment").value.trim(),
+    onRim: document.getElementById("stock-tire-onrim").checked
+  };
+
+  try {
+    await apiCreateTireStock(item);
+    document.getElementById("form-add-stock-tire").reset();
+    document.getElementById("form-add-stock-tire").style.display = "none";
+    await renderStock();
+  } catch (err) {
+    alert("Opslaan mislukt: " + err.message);
+  }
+});
+
+// Rim form - add button dynamically or reuse
+document.querySelector(".stock-tab[data-tab='rims']")?.addEventListener("click", () => {
+  // Show add rim button area - for now toggle via existing button text
+});
+
+// Simple: change the add button based on active tab
+document.querySelectorAll(".stock-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    const addBtn = document.getElementById("btn-add-stock-tire");
+    if (tab.dataset.tab === "rims") {
+      addBtn.textContent = "+ Velg";
+      addBtn.onclick = () => {
+        document.getElementById("form-add-stock-rim").style.display = "block";
+        document.getElementById("form-add-stock-tire").style.display = "none";
+      };
+    } else {
+      addBtn.textContent = "+ Band";
+      addBtn.onclick = () => {
+        document.getElementById("form-add-stock-tire").style.display = "block";
+        document.getElementById("form-add-stock-rim").style.display = "none";
+      };
+    }
+  });
+});
+
+document.getElementById("cancel-stock-rim")?.addEventListener("click", () => {
+  document.getElementById("form-add-stock-rim").style.display = "none";
+});
+
+document.getElementById("form-add-stock-rim")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const item = {
+    material: document.getElementById("stock-rim-material").value,
+    size: document.getElementById("stock-rim-size").value.trim(),
+    comment: document.getElementById("stock-rim-comment").value.trim()
+  };
+
+  try {
+    await apiCreateRimStock(item);
+    document.getElementById("form-add-stock-rim").reset();
+    document.getElementById("form-add-stock-rim").style.display = "none";
+    await renderStock();
+  } catch (err) {
+    alert("Opslaan mislukt: " + err.message);
+  }
+});
