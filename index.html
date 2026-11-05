@@ -288,7 +288,49 @@
         <button class="stock-tab active" data-tab="tires">Banden</button>
         <button class="stock-tab" data-tab="rims">Velgen</button>
       </div>
-      <div id="stock-tires-list"></div>
+      
+      <form id="form-add-stock-tire" class="add-vehicle-form" style="display:none;margin-bottom:16px">
+        <h3>Band toevoegen</h3>
+        <label>Merk</label>
+        <input type="text" id="stock-tire-brand" required>
+        <label>Type</label>
+        <input type="text" id="stock-tire-type">
+        <label>Maat</label>
+        <input type="text" id="stock-tire-size" placeholder="315/70 R22.5">
+        <label>As type</label>
+        <select id="stock-tire-axle" multiple style="height:70px">
+          <option value="steer">Stuur</option>
+          <option value="driven">Aandrijf</option>
+          <option value="trailer">Trailer</option>
+        </select>
+        <label>DOT</label>
+        <input type="text" id="stock-tire-dot" placeholder="2524">
+        <label>Opmerking</label>
+        <input type="text" id="stock-tire-comment">
+        <label class="checkbox-row"><input type="checkbox" id="stock-tire-onrim"> Op velg</label>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Opslaan</button>
+          <button type="button" id="cancel-stock-tire" class="btn-secondary">Annuleren</button>
+        </div>
+      </form>
+
+      <form id="form-add-stock-rim" class="add-vehicle-form" style="display:none;margin-bottom:16px">
+        <h3>Velg toevoegen</h3>
+        <label>Materiaal</label>
+        <select id="stock-rim-material" required>
+          <option value="steel">Staal</option>
+          <option value="alu">Alu</option>
+        </select>
+        <label>Maat</label>
+        <input type="text" id="stock-rim-size" placeholder="22.5x120" required>
+        <label>Opmerking</label>
+        <input type="text" id="stock-rim-comment">
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Opslaan</button>
+          <button type="button" id="cancel-stock-rim" class="btn-secondary">Annuleren</button>
+        </div>
+      </form>
+<div id="stock-tires-list"></div>
       <div id="stock-rims-list" style="display:none"></div>
     </section>
 
