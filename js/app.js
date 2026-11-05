@@ -2205,9 +2205,10 @@ async function renderStock() {
           <span class="badge-regrooved">${t.onRim ? "Op velg" : "Los"}</span>
           <button class="btn-danger btn-sm stock-delete" data-id="${t.id}" data-type="tire" style="margin-left:auto">✕</button>
         </div>
-        <div class="tire-brand">${t.size || ""} • DOT ${t.dotCode || "–"}</div>
+        <div class="tire-brand">${t.size || ""} • DOT ${t.dotCode || "–"} • ${t.depth != null ? t.depth + " mm" : "–"}</div>
         <div class="tire-info">
           <span>${(t.axleTypes || []).join(", ") || "–"}</span>
+          ${t.regrooved ? `<span class="badge-regrooved">Geherprofileerd</span>` : ""}
           ${t.comment ? `<span>${t.comment}</span>` : ""}
         </div>
       </div>
@@ -2274,8 +2275,10 @@ document.getElementById("form-add-stock-tire")?.addEventListener("submit", async
     size: document.getElementById("stock-tire-size").value.trim(),
     axleTypes,
     dotCode: document.getElementById("stock-tire-dot").value.trim(),
+    depth: parseFloat(document.getElementById("stock-tire-depth").value) || null,
     comment: document.getElementById("stock-tire-comment").value.trim(),
-    onRim: document.getElementById("stock-tire-onrim").checked
+    onRim: document.getElementById("stock-tire-onrim").checked,
+    regrooved: document.getElementById("stock-tire-regrooved").checked
   };
 
   try {
