@@ -290,3 +290,52 @@ async function apiRefreshUser() {
   await pb.collection("users").authRefresh();
   return pb.authStore.model;
 }
+
+
+// ----- Tire stock -----
+async function apiGetTireStock() {
+  const data = await pbRequest("collections/tire_stock/records?perPage=200&sort=-created");
+  return data.items || [];
+}
+
+async function apiCreateTireStock(item) {
+  return pbRequest("collections/tire_stock/records", {
+    method: "POST",
+    body: JSON.stringify(item)
+  });
+}
+
+async function apiUpdateTireStock(id, fields) {
+  return pbRequest(`collections/tire_stock/records/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(fields)
+  });
+}
+
+async function apiDeleteTireStock(id) {
+  return pbRequest(`collections/tire_stock/records/${id}`, { method: "DELETE" });
+}
+
+// ----- Rim stock -----
+async function apiGetRimStock() {
+  const data = await pbRequest("collections/rim_stock/records?perPage=200&sort=-created");
+  return data.items || [];
+}
+
+async function apiCreateRimStock(item) {
+  return pbRequest("collections/rim_stock/records", {
+    method: "POST",
+    body: JSON.stringify(item)
+  });
+}
+
+async function apiUpdateRimStock(id, fields) {
+  return pbRequest(`collections/rim_stock/records/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(fields)
+  });
+}
+
+async function apiDeleteRimStock(id) {
+  return pbRequest(`collections/rim_stock/records/${id}`, { method: "DELETE" });
+}

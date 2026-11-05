@@ -69,7 +69,8 @@ const pages = {
   0: "page-dashboard",
   1: "page-vehicles",
   2: "page-alerts",
-  3: "page-todo"
+  3: "page-stock",
+  4: "page-todo"
 };
 
 navItems.forEach((item, index) => {
@@ -2186,4 +2187,65 @@ document.getElementById("change-profile-form")?.addEventListener("submit", async
     resultEl.style.color = "#ef4444";
     resultEl.style.display = "block";
   }
+});
+
+
+// ===== Stock =====
+async function renderStock() {
+  const tiresEl = document.getElementById("stock-tires-list");
+  const rimsEl = document.getElementById("stock-rims-list");
+  if (!tiresEl) return;
+
+  try {
+    const tires = await apiGetTireStock();
+    tiresEl.innerHTML = tires.length ? tires.map(t => `
+      <div class="tire-card">
+        <div class="tire-card-top">
+          <div class="tire-pos">${t.brand || ""} ${t.type || ""}</div>
+          <span class="badge-regrooved">${t.onRim ? "Op velg" : "Los"}</span>
+        </div>
+        <div class="tire-brand">${t.size || ""} • DOT ${t.dotCode || "–"}</div>
+        <div class="tire-info">
+          <span>${(t.axleTypes || []).join(", ") || "–"}</span>
+          ${t.comment ? `<span>${t.comment}</span>` : ""}
+        </div>
+      </div>
+    `).join("") : `<p class="placeholder">Geen banden op voorraad.</p>`;
+  } catch (e) {
+    tiresEl.innerHTML = `<p class="placeholder">Kon voorraad niet laden.</p>`;
+  }
+
+  try {
+    const rims = await apiGetRimStock();
+    rimsEl.innerHTML = rims.length ? rims.map(r => `
+      <div class="tire-card">
+        <div class="tire-card-top">
+          <div class="tire-pos">${r.material === "alu" ? "Alu" : "Staal"}</div>
+        </div>
+        <div class="tire-brand">${r.size || ""}</div>
+        ${r.comment ? `<div class="tire-info"><span>${r.comment}</span></div>` : ""}
+      </div>
+    `).join("") : `<p class="placeholder">Geen velgen op voorraad.</p>`;
+  } catch (e) {
+    rimsEl.innerHTML = `<p class="placeholder">Kon velgen niet laden.</p>`;
+  }
+}
+
+document.querySelectorAll(".stock-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".stock-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const which = tab.dataset.tab;
+    document.getElementById("stock-tires-list").style.display = which === "tires" ? "" : "none";
+    document.getElementById("stock-rims-list").style.display = which === "rims" ? "" : "none";
+  });
+});
+
+// Load stock when tab is opened
+const origNav = navItems;
+// Hook into existing nav click - add stock load
+document.querySelectorAll(".nav-item").forEach((item, index) => {
+  item.addEventListener("click", async () => {
+    if (index === 3) await renderStock();
+  });
 });
