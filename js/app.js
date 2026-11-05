@@ -2203,6 +2203,7 @@ async function renderStock() {
         <div class="tire-card-top">
           <div class="tire-pos">${t.brand || ""} ${t.type || ""}</div>
           <span class="badge-regrooved">${t.onRim ? "Op velg" : "Los"}</span>
+          <button class="btn-danger btn-sm stock-delete" data-id="${t.id}" data-type="tire" style="margin-left:auto">✕</button>
         </div>
         <div class="tire-brand">${t.size || ""} • DOT ${t.dotCode || "–"}</div>
         <div class="tire-info">
@@ -2221,6 +2222,7 @@ async function renderStock() {
       <div class="tire-card">
         <div class="tire-card-top">
           <div class="tire-pos">${r.material === "alu" ? "Alu" : "Staal"}</div>
+          <button class="btn-danger btn-sm stock-delete" data-id="${r.id}" data-type="rim" style="margin-left:auto">✕</button>
         </div>
         <div class="tire-brand">${r.size || ""}</div>
         ${r.comment ? `<div class="tire-info"><span>${r.comment}</span></div>` : ""}
@@ -2330,5 +2332,31 @@ document.getElementById("form-add-stock-rim")?.addEventListener("submit", async 
     await renderStock();
   } catch (err) {
     alert("Opslaan mislukt: " + err.message);
+  }
+});
+
+
+document.getElementById("stock-tires-list")?.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".stock-delete");
+  if (!btn) return;
+  if (!confirm("Verwijderen?")) return;
+  try {
+    if (btn.dataset.type === "tire") await apiDeleteTireStock(btn.dataset.id);
+    else await apiDeleteRimStock(btn.dataset.id);
+    await renderStock();
+  } catch (err) {
+    alert("Verwijderen mislukt: " + err.message);
+  }
+});
+
+document.getElementById("stock-rims-list")?.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".stock-delete");
+  if (!btn) return;
+  if (!confirm("Verwijderen?")) return;
+  try {
+    await apiDeleteRimStock(btn.dataset.id);
+    await renderStock();
+  } catch (err) {
+    alert("Verwijderen mislukt: " + err.message);
   }
 });
